@@ -19,12 +19,7 @@ public class MetadataValidationFixture extends RecordEndpointFixture {
 	private String dataDivider;
 	private String validationOrderType;
 	private String jsonRecordToValidate;
-	// private String type;
-	// private String authToken;
-	// private String id;
-	// private String json;
-	String valid;
-	// private String baseUrl = SystemUrl.getUrl() + "rest/record/";
+	private String valid;
 
 	public MetadataValidationFixture() {
 		httpHandlerFactory = DependencyProvider.getHttpHandlerFactory();
@@ -47,34 +42,68 @@ public class MetadataValidationFixture extends RecordEndpointFixture {
 	private ClientDataGroup createValidationOrder() {
 		ClientDataGroup validationOrder = ClientDataGroup.withNameInData("validationOrder");
 		createAndAddRecordInfo(validationOrder);
-
 		createAndAddRecordTypeGroup(validationOrder);
-
-		validationOrder
-				.addChild(ClientDataAtomic.withNameInDataAndValue("validateLinks", validateLinks));
-		validationOrder.addChild(
-				ClientDataAtomic.withNameInDataAndValue("metadataToValidate", "existing"));
+		createAndAddAtomicValues(validationOrder);
 		return validationOrder;
 	}
 
 	private void createAndAddRecordInfo(ClientDataGroup validationOrder) {
 		ClientDataGroup recordInfo = ClientDataGroup.withNameInData("recordInfo");
-		ClientDataGroup dataDividerGroup = ClientDataGroup.withNameInData("dataDivider");
-		dataDividerGroup
-				.addChild(ClientDataAtomic.withNameInDataAndValue("linkedRecordType", "system"));
-		dataDividerGroup
-				.addChild(ClientDataAtomic.withNameInDataAndValue("linkedRecordId", dataDivider));
+		ClientDataGroup dataDividerGroup = createLinkUsingNameInDataRecordTypeAndRecordId(
+				"dataDivider", "system", dataDivider);
 		recordInfo.addChild(dataDividerGroup);
 		validationOrder.addChild(recordInfo);
 	}
 
+	private ClientDataGroup createLinkUsingNameInDataRecordTypeAndRecordId(String nameInData,
+			String linkedRecordType, String linkedRecordId) {
+		ClientDataGroup linkGroup = ClientDataGroup.withNameInData(nameInData);
+		linkGroup.addChild(
+				ClientDataAtomic.withNameInDataAndValue("linkedRecordType", linkedRecordType));
+		linkGroup.addChild(
+				ClientDataAtomic.withNameInDataAndValue("linkedRecordId", linkedRecordId));
+		return linkGroup;
+	}
+
 	private void createAndAddRecordTypeGroup(ClientDataGroup validationOrder) {
-		ClientDataGroup recordTypeGroup = ClientDataGroup.withNameInData("recordType");
-		recordTypeGroup.addChild(
-				ClientDataAtomic.withNameInDataAndValue("linkedRecordType", "recordType"));
-		recordTypeGroup.addChild(
-				ClientDataAtomic.withNameInDataAndValue("linkedRecordId", validationOrderType));
+		ClientDataGroup recordTypeGroup = createLinkUsingNameInDataRecordTypeAndRecordId(
+				"recordType", "recordType", validationOrderType);
 		validationOrder.addChild(recordTypeGroup);
+	}
+
+	private void createAndAddAtomicValues(ClientDataGroup validationOrder) {
+		validationOrder
+				.addChild(ClientDataAtomic.withNameInDataAndValue("validateLinks", validateLinks));
+		validationOrder.addChild(
+				ClientDataAtomic.withNameInDataAndValue("metadataToValidate", "existing"));
+	}
+
+	public String testValidateRecord() {
+		HttpHandler httpHandler = createHttpHandlerForPostWithUrlAndContentType(
+				baseUrl + "workOrder", "application/vnd.uub.workorder+json");
+		statusType = Response.Status.fromStatusCode(httpHandler.getResponseCode());
+
+		return getResponseTextFromHttpHandler(httpHandler);
+	}
+
+	private String getResponseTextFromHttpHandler(HttpHandler httpHandler) {
+		if (responseIsOk()) {
+			return getValidationResponseText(httpHandler);
+		}
+		return httpHandler.getErrorText();
+	}
+
+	private String getValidationResponseText(HttpHandler httpHandler) {
+		String responseText = httpHandler.getResponseText();
+		extractAndSetValidValue(responseText);
+		return responseText;
+	}
+
+	private void extractAndSetValidValue(String responseText) {
+		ClientDataRecord validationResultRecord = convertJsonToClientDataRecord(responseText);
+
+		ClientDataGroup dataGroup = validationResultRecord.getClientDataGroup();
+		valid = dataGroup.getFirstAtomicValueWithNameInData("valid");
 	}
 
 	@Override
@@ -95,22 +124,6 @@ public class MetadataValidationFixture extends RecordEndpointFixture {
 	public void setValidationOrderRecordType(String validationOrderRecordType) {
 		this.validationOrderType = validationOrderRecordType;
 
-	}
-
-	public String testValidateRecord() {
-		HttpHandler httpHandler = createHttpHandlerForPostWithUrlAndContentType(
-				baseUrl + "workOrder", "application/vnd.uub.workorder+json");
-		statusType = Response.Status.fromStatusCode(httpHandler.getResponseCode());
-
-		if (statusType.equals(Response.Status.OK)) {
-			String responseText = httpHandler.getResponseText();
-			ClientDataRecord validationResultRecord = convertJsonToClientDataRecord(responseText);
-
-			ClientDataGroup dataGroup = validationResultRecord.getClientDataGroup();
-			valid = dataGroup.getFirstAtomicValueWithNameInData("valid");
-			return responseText;
-		}
-		return httpHandler.getErrorText();
 	}
 
 	public void setJsonRecordToValidate(String jsonRecordToValidate) {

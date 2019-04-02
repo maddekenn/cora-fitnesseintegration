@@ -37,7 +37,6 @@ import se.uu.ub.cora.clientdata.ClientDataRecord;
 public class RecordEndpointFixtureTest {
 	private RecordEndpointFixture fixture;
 	private HttpHandlerFactorySpy httpHandlerFactorySpy;
-	private JsonToDataConverterFactorySpy jsonToDataConverterFactory;
 
 	@BeforeMethod
 	public void setUp() {
@@ -48,8 +47,6 @@ public class RecordEndpointFixtureTest {
 		DependencyProvider.setJsonToDataFactoryClassName(
 				"se.uu.ub.cora.fitnesseintegration.JsonToDataConverterFactorySpy");
 		httpHandlerFactorySpy = (HttpHandlerFactorySpy) DependencyProvider.getHttpHandlerFactory();
-		jsonToDataConverterFactory = (JsonToDataConverterFactorySpy) DependencyProvider
-				.getJsonToDataConverterFactory();
 		fixture = new RecordEndpointFixture();
 	}
 
