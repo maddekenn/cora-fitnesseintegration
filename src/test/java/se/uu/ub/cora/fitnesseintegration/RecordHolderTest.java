@@ -16,7 +16,7 @@ public class RecordHolderTest {
 	}
 
 	@Test
-	public void testName() throws Exception {
+	public void testSetAndGetRecord() throws Exception {
 		ClientDataGroup clientDataGroup = ClientDataGroup.withNameInData("someName");
 		ClientDataRecord clientDataRecord = ClientDataRecord.withClientDataGroup(clientDataGroup);
 		RecordHolder.setRecord(clientDataRecord);
