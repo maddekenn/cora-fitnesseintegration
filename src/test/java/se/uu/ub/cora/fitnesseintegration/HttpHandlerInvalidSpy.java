@@ -76,4 +76,10 @@ public class HttpHandlerInvalidSpy implements HttpHandler {
 		return null;
 	}
 
+	@Override
+	public void setBasicAuthorization(String arg0, String arg1) {
+		// TODO Auto-generated method stub
+
+	}
+
 }
