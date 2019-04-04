@@ -37,7 +37,6 @@ import se.uu.ub.cora.clientdata.ClientDataRecord;
 public class RecordEndpointFixtureTest {
 	private RecordEndpointFixture fixture;
 	private HttpHandlerFactorySpy httpHandlerFactorySpy;
-	private JsonToDataConverterFactorySpy jsonToDataConverterFactory;
 
 	@BeforeMethod
 	public void setUp() {
@@ -48,8 +47,6 @@ public class RecordEndpointFixtureTest {
 		DependencyProvider.setJsonToDataFactoryClassName(
 				"se.uu.ub.cora.fitnesseintegration.JsonToDataConverterFactorySpy");
 		httpHandlerFactorySpy = (HttpHandlerFactorySpy) DependencyProvider.getHttpHandlerFactory();
-		jsonToDataConverterFactory = (JsonToDataConverterFactorySpy) DependencyProvider
-				.getJsonToDataConverterFactory();
 		fixture = new RecordEndpointFixture();
 	}
 
@@ -425,58 +422,4 @@ public class RecordEndpointFixtureTest {
 		assertTrue(RecordHolder.getRecord() instanceof ClientDataRecord);
 	}
 
-	@Test
-	public void testValidateRecordDataForFactoryIsOk() {
-		jsonToDataConverterFactory.typeToFactor = "validatorSpy";
-		fixture.setType("someType");
-		fixture.setId("someId");
-		fixture.setAuthToken("someToken");
-		fixture.setJson("{\"name\":\"value\"}");
-		fixture.testValidateRecord();
-		assertCorrectHttpHandlerForValidate();
-
-		JsonToDataConverterForValidationSpy converterSpy = (JsonToDataConverterForValidationSpy) jsonToDataConverterFactory.factored;
-
-		assertTrue(converterSpy.toInstanceWasCalled);
-
-	}
-
-	private void assertCorrectHttpHandlerForValidate() {
-		HttpHandlerSpy httpHandlerSpy = httpHandlerFactorySpy.httpHandlerSpy;
-		assertEquals(httpHandlerSpy.requestMetod, "POST");
-		assertEquals(httpHandlerSpy.outputString, "{\"name\":\"value\"}");
-		assertEquals(httpHandlerSpy.requestProperties.get("Accept"),
-				"application/vnd.uub.record+json");
-		assertEquals(httpHandlerSpy.requestProperties.get("Content-Type"),
-				"application/vnd.uub.workorder+json");
-		assertEquals(httpHandlerSpy.requestProperties.get("authToken"), "someToken");
-		assertEquals(httpHandlerSpy.requestProperties.size(), 3);
-		assertEquals(httpHandlerFactorySpy.urlString,
-				"http://localhost:8080/therest/rest/record/workOrder");
-	}
-
-	@Test
-	public void testValidateRecordOk() {
-		jsonToDataConverterFactory.typeToFactor = "validatorSpy";
-		assertEquals(fixture.testValidateRecord(),
-				httpHandlerFactorySpy.httpHandlerSpy.responseText);
-		assertEquals(fixture.getValid(), "true");
-	}
-
-	@Test
-	public void testValidateRecordNotOk() {
-		jsonToDataConverterFactory.isValid = "false";
-		jsonToDataConverterFactory.typeToFactor = "validatorSpy";
-		assertEquals(fixture.testValidateRecord(),
-				httpHandlerFactorySpy.httpHandlerSpy.responseText);
-		assertEquals(fixture.getValid(), "false");
-	}
-
-	@Test
-	public void testValidateRecordIncorrectValidationOrder() {
-		httpHandlerFactorySpy.changeFactoryToFactorInvalidHttpHandlers();
-		jsonToDataConverterFactory.isValid = "false";
-		jsonToDataConverterFactory.typeToFactor = "validatorSpy";
-		assertEquals(fixture.testValidateRecord(), "bad things happend");
-	}
 }
