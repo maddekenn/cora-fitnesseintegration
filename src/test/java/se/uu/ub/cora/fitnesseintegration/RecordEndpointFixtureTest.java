@@ -32,7 +32,7 @@ import org.apache.http.client.ClientProtocolException;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import se.uu.ub.cora.clientdata.ClientDataRecord;
+import se.uu.ub.cora.data.DataRecord;
 
 public class RecordEndpointFixtureTest {
 	private RecordEndpointFixture fixture;
@@ -419,7 +419,7 @@ public class RecordEndpointFixtureTest {
 		fixture.testReadRecordAndStoreJson();
 
 		assertNotEquals(RecordHolder.getRecord(), null);
-		assertTrue(RecordHolder.getRecord() instanceof ClientDataRecord);
+		assertTrue(RecordHolder.getRecord() instanceof DataRecord);
 	}
 
 }

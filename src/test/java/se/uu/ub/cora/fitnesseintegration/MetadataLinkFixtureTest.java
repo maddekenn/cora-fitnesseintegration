@@ -25,10 +25,9 @@ import static org.testng.Assert.assertTrue;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import se.uu.ub.cora.clientdata.ClientDataAtomic;
-import se.uu.ub.cora.clientdata.ClientDataGroup;
-import se.uu.ub.cora.clientdata.ClientDataRecord;
-import se.uu.ub.cora.clientdata.converter.jsontojava.JsonToDataRecordConverter;
+import se.uu.ub.cora.data.DataAtomic;
+import se.uu.ub.cora.data.DataGroup;
+import se.uu.ub.cora.data.DataRecord;
 import se.uu.ub.cora.json.parser.JsonObject;
 import se.uu.ub.cora.json.parser.JsonString;
 
@@ -51,33 +50,33 @@ public class MetadataLinkFixtureTest {
 				.getJsonToDataConverterFactory();
 		fixture = new MetadataLinkFixture();
 
-		ClientDataGroup topLevelDataGroup = createTopLevelDataGroup();
+		DataGroup topLevelDataGroup = createTopLevelDataGroup();
 
-		ClientDataRecord record = ClientDataRecord.withClientDataGroup(topLevelDataGroup);
+		DataRecord record = DataRecord.withDataGroup(topLevelDataGroup);
 		RecordHolder.setRecord(record);
 
 	}
 
-	private ClientDataGroup createTopLevelDataGroup() {
-		ClientDataGroup topLevelDataGroup = ClientDataGroup.withNameInData("metadata");
-		ClientDataGroup childReferences = ClientDataGroup.withNameInData("childReferences");
-		ClientDataGroup childReference = createChildReferenceWithRepeatIdRecordTypeAndRecordId("0",
+	private DataGroup createTopLevelDataGroup() {
+		DataGroup topLevelDataGroup = DataGroup.withNameInData("metadata");
+		DataGroup childReferences = DataGroup.withNameInData("childReferences");
+		DataGroup childReference = createChildReferenceWithRepeatIdRecordTypeAndRecordId("0",
 				"metadataGroup", "someRecordId", "0", "X");
 		childReferences.addChild(childReference);
 		topLevelDataGroup.addChild(childReferences);
 		return topLevelDataGroup;
 	}
 
-	private ClientDataGroup createChildReferenceWithRepeatIdRecordTypeAndRecordId(String repeatId,
+	private DataGroup createChildReferenceWithRepeatIdRecordTypeAndRecordId(String repeatId,
 			String linkedRecordType, String linkedRecordId, String repeatMin, String repeatMax) {
-		ClientDataGroup childReference = ClientDataGroup.withNameInData("childReference");
+		DataGroup childReference = DataGroup.withNameInData("childReference");
 		childReference.setRepeatId(repeatId);
-		ClientDataGroup ref = ClientDataGroup.withNameInData("ref");
-		ref.addChild(ClientDataAtomic.withNameInDataAndValue("linkedRecordType", linkedRecordType));
-		ref.addChild(ClientDataAtomic.withNameInDataAndValue("linkedRecordId", linkedRecordId));
+		DataGroup ref = DataGroup.withNameInData("ref");
+		ref.addChild(DataAtomic.withNameInDataAndValue("linkedRecordType", linkedRecordType));
+		ref.addChild(DataAtomic.withNameInDataAndValue("linkedRecordId", linkedRecordId));
 		childReference.addChild(ref);
-		childReference.addChild(ClientDataAtomic.withNameInDataAndValue("repeatMin", repeatMin));
-		childReference.addChild(ClientDataAtomic.withNameInDataAndValue("repeatMax", repeatMax));
+		childReference.addChild(DataAtomic.withNameInDataAndValue("repeatMin", repeatMin));
+		childReference.addChild(DataAtomic.withNameInDataAndValue("repeatMax", repeatMax));
 		return childReference;
 	}
 
@@ -121,8 +120,8 @@ public class MetadataLinkFixtureTest {
 
 	@Test
 	public void testNoMatchingChild() {
-		ClientDataGroup topLevelDataGroup = ClientDataGroup.withNameInData("metadata");
-		ClientDataRecord record = ClientDataRecord.withClientDataGroup(topLevelDataGroup);
+		DataGroup topLevelDataGroup = DataGroup.withNameInData("metadata");
+		DataRecord record = DataRecord.withDataGroup(topLevelDataGroup);
 		RecordHolder.setRecord(record);
 		fixture.setLinkedRecordType("metadataGroup");
 		fixture.setLinkedRecordId("someRecordId");
@@ -132,7 +131,7 @@ public class MetadataLinkFixtureTest {
 
 	@Test
 	public void testNoTopLevelDatagroupInRecord() {
-		ClientDataRecord record = ClientDataRecord.withClientDataGroup(null);
+		DataRecord record = DataRecord.withDataGroup(null);
 		RecordHolder.setRecord(record);
 		fixture.setLinkedRecordId("someRecordId");
 		fixture.setLinkedRecordType("metadataGroup");
@@ -140,11 +139,10 @@ public class MetadataLinkFixtureTest {
 	}
 
 	private void createAndAddSecondChild() {
-		ClientDataRecord record = RecordHolder.getRecord();
-		ClientDataGroup clientDataGroup = record.getClientDataGroup();
-		ClientDataGroup childReferences = clientDataGroup
-				.getFirstGroupWithNameInData("childReferences");
-		ClientDataGroup childReference = createChildReferenceWithRepeatIdRecordTypeAndRecordId("1",
+		DataRecord record = RecordHolder.getRecord();
+		DataGroup clientDataGroup = record.getDataGroup();
+		DataGroup childReferences = clientDataGroup.getFirstGroupWithNameInData("childReferences");
+		DataGroup childReference = createChildReferenceWithRepeatIdRecordTypeAndRecordId("1",
 				"metadataGroup", "someOtherRecordId", "1", "3");
 		childReferences.addChild(childReference);
 	}

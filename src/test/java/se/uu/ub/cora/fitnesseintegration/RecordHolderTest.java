@@ -5,8 +5,8 @@ import static org.testng.Assert.assertNotNull;
 
 import org.testng.annotations.Test;
 
-import se.uu.ub.cora.clientdata.ClientDataGroup;
-import se.uu.ub.cora.clientdata.ClientDataRecord;
+import se.uu.ub.cora.data.DataGroup;
+import se.uu.ub.cora.data.DataRecord;
 
 public class RecordHolderTest {
 	@Test
@@ -17,8 +17,8 @@ public class RecordHolderTest {
 
 	@Test
 	public void testSetAndGetRecord() throws Exception {
-		ClientDataGroup clientDataGroup = ClientDataGroup.withNameInData("someName");
-		ClientDataRecord clientDataRecord = ClientDataRecord.withClientDataGroup(clientDataGroup);
+		DataGroup clientDataGroup = DataGroup.withNameInData("someName");
+		DataRecord clientDataRecord = DataRecord.withDataGroup(clientDataGroup);
 		RecordHolder.setRecord(clientDataRecord);
 		assertEquals(RecordHolder.getRecord(), clientDataRecord);
 	}

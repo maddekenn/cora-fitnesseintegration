@@ -29,9 +29,8 @@ import java.nio.charset.StandardCharsets;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.StatusType;
 
-import se.uu.ub.cora.clientdata.ClientDataRecord;
-import se.uu.ub.cora.clientdata.converter.jsontojava.JsonToDataConverterFactory;
-import se.uu.ub.cora.clientdata.converter.jsontojava.JsonToDataRecordConverter;
+import se.uu.ub.cora.data.DataRecord;
+import se.uu.ub.cora.data.converter.JsonToDataConverterFactory;
 import se.uu.ub.cora.httphandler.HttpHandler;
 import se.uu.ub.cora.httphandler.HttpHandlerFactory;
 import se.uu.ub.cora.httphandler.HttpMultiPartUploader;
@@ -388,12 +387,12 @@ public class RecordEndpointFixture {
 
 	public void testReadRecordAndStoreJson() {
 		String responseText = testReadRecord();
-		ClientDataRecord clientDataRecord = convertJsonToClientDataRecord(responseText);
+		DataRecord clientDataRecord = convertJsonToClientDataRecord(responseText);
 
 		RecordHolder.setRecord(clientDataRecord);
 	}
 
-	protected ClientDataRecord convertJsonToClientDataRecord(String responseText) {
+	protected DataRecord convertJsonToClientDataRecord(String responseText) {
 		JsonObject recordJsonObject = createJsonObjectFromResponseText(responseText);
 
 		JsonToDataRecordConverter converter = JsonToDataRecordConverter

@@ -21,11 +21,9 @@ package se.uu.ub.cora.fitnesseintegration;
 import java.util.ArrayList;
 import java.util.List;
 
-import se.uu.ub.cora.clientdata.ClientDataGroup;
-import se.uu.ub.cora.clientdata.ClientDataRecord;
-import se.uu.ub.cora.clientdata.RecordIdentifier;
-import se.uu.ub.cora.clientdata.converter.jsontojava.JsonToDataConverterFactory;
-import se.uu.ub.cora.clientdata.converter.jsontojava.JsonToDataRecordConverter;
+import se.uu.ub.cora.data.DataGroup;
+import se.uu.ub.cora.data.DataRecord;
+import se.uu.ub.cora.data.converter.JsonToDataConverterFactory;
 import se.uu.ub.cora.httphandler.HttpHandler;
 import se.uu.ub.cora.httphandler.HttpHandlerFactory;
 import se.uu.ub.cora.json.parser.JsonObject;
@@ -37,8 +35,8 @@ public class MetadataLinkFixture {
 
 	protected String linkedRecordType;
 	protected String linkedRecordId;
-	private List<ClientDataGroup> childReferenceList = new ArrayList<>();
-	private ClientDataGroup matchingChildReference;
+	private List<DataGroup> childReferenceList = new ArrayList<>();
+	private DataGroup matchingChildReference;
 	private HttpHandlerFactory httpHandlerFactory;
 	private String baseUrl = SystemUrl.getUrl() + "rest/record/";
 	private String authToken;
@@ -81,36 +79,36 @@ public class MetadataLinkFixture {
 	}
 
 	private void possiblySetChildReferenceList() {
-		ClientDataRecord record = RecordHolder.getRecord();
+		DataRecord record = RecordHolder.getRecord();
 		if (recordContainsDataGroup(record)) {
-			ClientDataGroup topLevelDataGroup = record.getClientDataGroup();
+			DataGroup topLevelDataGroup = record.getDataGroup();
 			setChildReferenceList(topLevelDataGroup);
 		}
 	}
 
-	private boolean recordContainsDataGroup(ClientDataRecord record) {
-		return null != record && record.getClientDataGroup() != null;
+	private boolean recordContainsDataGroup(DataRecord record) {
+		return null != record && record.getDataGroup() != null;
 	}
 
-	private void setChildReferenceList(ClientDataGroup topLevelDataGroup) {
+	private void setChildReferenceList(DataGroup topLevelDataGroup) {
 		if (childReferencesExists(topLevelDataGroup)) {
-			ClientDataGroup childReferences = topLevelDataGroup
+			DataGroup childReferences = topLevelDataGroup
 					.getFirstGroupWithNameInData("childReferences");
 			childReferenceList = childReferences.getAllGroupsWithNameInData("childReference");
 		}
 	}
 
-	private boolean childReferencesExists(ClientDataGroup topLevelDataGroup) {
+	private boolean childReferencesExists(DataGroup topLevelDataGroup) {
 		return topLevelDataGroup.containsChildWithNameInData("childReferences");
 	}
 
 	private void setMatchingChildReference() {
-		for (ClientDataGroup childReference : childReferenceList) {
+		for (DataGroup childReference : childReferenceList) {
 			setChildReferenceIfMatchingTypeAndId(childReference);
 		}
 	}
 
-	private void setChildReferenceIfMatchingTypeAndId(ClientDataGroup childReference) {
+	private void setChildReferenceIfMatchingTypeAndId(DataGroup childReference) {
 		String childLinkedRecordType = extractValueFromReferenceUsingNameInData(childReference,
 				"linkedRecordType");
 		String childLinkedRecordId = extractValueFromReferenceUsingNameInData(childReference,
@@ -137,9 +135,9 @@ public class MetadataLinkFixture {
 				&& childLinkedRecordType.equals(linkedRecordType);
 	}
 
-	protected String extractValueFromReferenceUsingNameInData(ClientDataGroup childReference,
+	protected String extractValueFromReferenceUsingNameInData(DataGroup childReference,
 			String childNameInData) {
-		ClientDataGroup ref = childReference.getFirstGroupWithNameInData("ref");
+		DataGroup ref = childReference.getFirstGroupWithNameInData("ref");
 		return ref.getFirstAtomicValueWithNameInData(childNameInData);
 	}
 
@@ -191,12 +189,12 @@ public class MetadataLinkFixture {
 		JsonObject recordJsonObject = createJsonObjectFromResponseText(responseText);
 		recordConverter = JsonToDataRecordConverter
 				.forJsonObjectUsingConverterFactory(recordJsonObject, jsonToDataConverterFactory);
-		ClientDataRecord clientDataRecord = recordConverter.toInstance();
+		DataRecord clientDataRecord = recordConverter.toInstance();
 		return getNameInDataFromDataGroupInRecord(clientDataRecord);
 	}
 
-	private String getNameInDataFromDataGroupInRecord(ClientDataRecord clientDataRecord) {
-		ClientDataGroup dataElement = clientDataRecord.getClientDataGroup();
+	private String getNameInDataFromDataGroupInRecord(DataRecord clientDataRecord) {
+		DataGroup dataElement = clientDataRecord.getDataGroup();
 		return dataElement.getFirstAtomicValueWithNameInData("nameInData");
 	}
 

@@ -1,6 +1,6 @@
 package se.uu.ub.cora.fitnesseintegration;
 
-import se.uu.ub.cora.clientdata.ClientDataRecord;
+import se.uu.ub.cora.data.DataRecord;
 
 public class RecordHolder {
 
@@ -9,13 +9,13 @@ public class RecordHolder {
 		super();
 	}
 
-	private static ClientDataRecord clientDataRecord;
+	private static DataRecord clientDataRecord;
 
-	public static void setRecord(ClientDataRecord clientDataRecord) {
+	public static void setRecord(DataRecord clientDataRecord) {
 		RecordHolder.clientDataRecord = clientDataRecord;
 	}
 
-	public static ClientDataRecord getRecord() {
+	public static DataRecord getRecord() {
 		return clientDataRecord;
 	}
 

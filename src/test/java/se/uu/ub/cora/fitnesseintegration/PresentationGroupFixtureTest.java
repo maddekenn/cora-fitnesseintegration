@@ -23,14 +23,14 @@ import static org.testng.Assert.assertEquals;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import se.uu.ub.cora.clientdata.ClientDataAtomic;
-import se.uu.ub.cora.clientdata.ClientDataGroup;
-import se.uu.ub.cora.clientdata.ClientDataRecord;
+import se.uu.ub.cora.data.DataAtomic;
+import se.uu.ub.cora.data.DataGroup;
+import se.uu.ub.cora.data.DataRecord;
 
 public class PresentationGroupFixtureTest {
 
 	PresentationGroupFixture fixture;
-	private ClientDataGroup topLevelDataGroup;
+	private DataGroup topLevelDataGroup;
 
 	@BeforeMethod
 	public void setUp() {
@@ -38,30 +38,30 @@ public class PresentationGroupFixtureTest {
 
 		topLevelDataGroup = createTopLevelDataGroup();
 
-		ClientDataRecord record = ClientDataRecord.withClientDataGroup(topLevelDataGroup);
+		DataRecord record = DataRecord.withDataGroup(topLevelDataGroup);
 		RecordHolder.setRecord(record);
 
 	}
 
-	private ClientDataGroup createTopLevelDataGroup() {
-		ClientDataGroup dataGroup = ClientDataGroup.withNameInData("presentation");
-		ClientDataGroup childReferences = ClientDataGroup.withNameInData("childReferences");
-		ClientDataGroup childReference = createChildReferenceWithRepeatIdRecordTypeRecordIdAndType(
-				"0", "presentationGroup", "somePresentationPGroup", "presentation");
+	private DataGroup createTopLevelDataGroup() {
+		DataGroup dataGroup = DataGroup.withNameInData("presentation");
+		DataGroup childReferences = DataGroup.withNameInData("childReferences");
+		DataGroup childReference = createChildReferenceWithRepeatIdRecordTypeRecordIdAndType("0",
+				"presentationGroup", "somePresentationPGroup", "presentation");
 		childReferences.addChild(childReference);
 		dataGroup.addChild(childReferences);
 		return dataGroup;
 	}
 
-	private ClientDataGroup createChildReferenceWithRepeatIdRecordTypeRecordIdAndType(
-			String repeatId, String linkedRecordType, String linkedRecordId, String typeAttribute) {
-		ClientDataGroup childReference = ClientDataGroup.withNameInData("childReference");
+	private DataGroup createChildReferenceWithRepeatIdRecordTypeRecordIdAndType(String repeatId,
+			String linkedRecordType, String linkedRecordId, String typeAttribute) {
+		DataGroup childReference = DataGroup.withNameInData("childReference");
 		childReference.setRepeatId(repeatId);
 
-		ClientDataGroup refGroup = ClientDataGroup.withNameInData("refGroup");
-		ClientDataGroup ref = ClientDataGroup.withNameInData("ref");
-		ref.addChild(ClientDataAtomic.withNameInDataAndValue("linkedRecordType", linkedRecordType));
-		ref.addChild(ClientDataAtomic.withNameInDataAndValue("linkedRecordId", linkedRecordId));
+		DataGroup refGroup = DataGroup.withNameInData("refGroup");
+		DataGroup ref = DataGroup.withNameInData("ref");
+		ref.addChild(DataAtomic.withNameInDataAndValue("linkedRecordType", linkedRecordType));
+		ref.addChild(DataAtomic.withNameInDataAndValue("linkedRecordId", linkedRecordId));
 		ref.addAttributeByIdWithValue("type", typeAttribute);
 		refGroup.addChild(ref);
 		childReference.addChild(refGroup);
@@ -79,7 +79,7 @@ public class PresentationGroupFixtureTest {
 
 	@Test
 	public void testNoTopLevelDataGroup() {
-		ClientDataRecord record = ClientDataRecord.withClientDataGroup(null);
+		DataRecord record = DataRecord.withDataGroup(null);
 		RecordHolder.setRecord(record);
 		fixture.setLinkedRecordId("somePresentationPGroup");
 		fixture.setLinkedRecordType("presentationGroup");
@@ -89,8 +89,8 @@ public class PresentationGroupFixtureTest {
 	@Test
 	public void testNumOfChildrenWithNoChildren() {
 
-		ClientDataGroup dataGroup = ClientDataGroup.withNameInData("presentation");
-		ClientDataRecord record = ClientDataRecord.withClientDataGroup(dataGroup);
+		DataGroup dataGroup = DataGroup.withNameInData("presentation");
+		DataRecord record = DataRecord.withDataGroup(dataGroup);
 		RecordHolder.setRecord(record);
 		fixture.setLinkedRecordId("somePresentationPGroup");
 		fixture.setLinkedRecordType("presentationGroup");
@@ -113,10 +113,10 @@ public class PresentationGroupFixtureTest {
 
 	@Test
 	public void testOneLinkIsPresentTwice() {
-		ClientDataGroup childReferences = topLevelDataGroup
+		DataGroup childReferences = topLevelDataGroup
 				.getFirstGroupWithNameInDataAndAttributes("childReferences");
-		ClientDataGroup childReference = createChildReferenceWithRepeatIdRecordTypeRecordIdAndType(
-				"1", "presentationGroup", "somePresentationPGroup", "presentation");
+		DataGroup childReference = createChildReferenceWithRepeatIdRecordTypeRecordIdAndType("1",
+				"presentationGroup", "somePresentationPGroup", "presentation");
 		childReferences.addChild(childReference);
 		fixture.setLinkedRecordType("presentationGroup");
 		fixture.setLinkedRecordId("somePresentationPGroup");

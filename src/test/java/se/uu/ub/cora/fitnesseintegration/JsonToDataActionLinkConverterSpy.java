@@ -18,10 +18,6 @@
  */
 package se.uu.ub.cora.fitnesseintegration;
 
-import se.uu.ub.cora.clientdata.Action;
-import se.uu.ub.cora.clientdata.ActionLink;
-import se.uu.ub.cora.clientdata.ClientData;
-import se.uu.ub.cora.clientdata.converter.jsontojava.JsonToDataActionLinkConverter;
 import se.uu.ub.cora.json.parser.JsonValue;
 
 public class JsonToDataActionLinkConverterSpy implements JsonToDataActionLinkConverter {
@@ -30,7 +26,7 @@ public class JsonToDataActionLinkConverterSpy implements JsonToDataActionLinkCon
 	}
 
 	@Override
-	public ClientData toInstance() {
+	public Data toInstance() {
 		return ActionLink.withAction(Action.READ);
 	}
 

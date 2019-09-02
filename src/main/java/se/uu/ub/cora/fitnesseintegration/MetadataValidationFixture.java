@@ -2,11 +2,11 @@ package se.uu.ub.cora.fitnesseintegration;
 
 import javax.ws.rs.core.Response;
 
-import se.uu.ub.cora.clientdata.ClientDataAtomic;
-import se.uu.ub.cora.clientdata.ClientDataGroup;
-import se.uu.ub.cora.clientdata.ClientDataRecord;
-import se.uu.ub.cora.clientdata.converter.javatojson.DataToJsonConverter;
-import se.uu.ub.cora.clientdata.converter.javatojson.DataToJsonConverterFactoryImp;
+import se.uu.ub.cora.data.DataAtomic;
+import se.uu.ub.cora.data.DataGroup;
+import se.uu.ub.cora.data.DataRecord;
+import se.uu.ub.cora.data.converter.DataToJsonConverter;
+import se.uu.ub.cora.data.converter.DataToJsonConverterFactoryImp;
 import se.uu.ub.cora.httphandler.HttpHandler;
 import se.uu.ub.cora.httphandler.HttpHandlerFactory;
 import se.uu.ub.cora.json.builder.JsonBuilderFactory;
@@ -26,7 +26,7 @@ public class MetadataValidationFixture extends RecordEndpointFixture {
 	}
 
 	public String testGetValidationOrder() {
-		ClientDataGroup validationOrder = createValidationOrder();
+		DataGroup validationOrder = createValidationOrder();
 
 		JsonBuilderFactory factory = new OrgJsonBuilderFactoryAdapter();
 		DataToJsonConverterFactoryImp dataToJsonConverterFactory = new DataToJsonConverterFactoryImp();
@@ -39,43 +39,40 @@ public class MetadataValidationFixture extends RecordEndpointFixture {
 
 	}
 
-	private ClientDataGroup createValidationOrder() {
-		ClientDataGroup validationOrder = ClientDataGroup.withNameInData("validationOrder");
+	private DataGroup createValidationOrder() {
+		DataGroup validationOrder = DataGroup.withNameInData("validationOrder");
 		createAndAddRecordInfo(validationOrder);
 		createAndAddRecordTypeGroup(validationOrder);
 		createAndAddAtomicValues(validationOrder);
 		return validationOrder;
 	}
 
-	private void createAndAddRecordInfo(ClientDataGroup validationOrder) {
-		ClientDataGroup recordInfo = ClientDataGroup.withNameInData("recordInfo");
-		ClientDataGroup dataDividerGroup = createLinkUsingNameInDataRecordTypeAndRecordId(
-				"dataDivider", "system", dataDivider);
+	private void createAndAddRecordInfo(DataGroup validationOrder) {
+		DataGroup recordInfo = DataGroup.withNameInData("recordInfo");
+		DataGroup dataDividerGroup = createLinkUsingNameInDataRecordTypeAndRecordId("dataDivider",
+				"system", dataDivider);
 		recordInfo.addChild(dataDividerGroup);
 		validationOrder.addChild(recordInfo);
 	}
 
-	private ClientDataGroup createLinkUsingNameInDataRecordTypeAndRecordId(String nameInData,
+	private DataGroup createLinkUsingNameInDataRecordTypeAndRecordId(String nameInData,
 			String linkedRecordType, String linkedRecordId) {
-		ClientDataGroup linkGroup = ClientDataGroup.withNameInData(nameInData);
-		linkGroup.addChild(
-				ClientDataAtomic.withNameInDataAndValue("linkedRecordType", linkedRecordType));
-		linkGroup.addChild(
-				ClientDataAtomic.withNameInDataAndValue("linkedRecordId", linkedRecordId));
+		DataGroup linkGroup = DataGroup.withNameInData(nameInData);
+		linkGroup.addChild(DataAtomic.withNameInDataAndValue("linkedRecordType", linkedRecordType));
+		linkGroup.addChild(DataAtomic.withNameInDataAndValue("linkedRecordId", linkedRecordId));
 		return linkGroup;
 	}
 
-	private void createAndAddRecordTypeGroup(ClientDataGroup validationOrder) {
-		ClientDataGroup recordTypeGroup = createLinkUsingNameInDataRecordTypeAndRecordId(
-				"recordType", "recordType", validationOrderType);
+	private void createAndAddRecordTypeGroup(DataGroup validationOrder) {
+		DataGroup recordTypeGroup = createLinkUsingNameInDataRecordTypeAndRecordId("recordType",
+				"recordType", validationOrderType);
 		validationOrder.addChild(recordTypeGroup);
 	}
 
-	private void createAndAddAtomicValues(ClientDataGroup validationOrder) {
+	private void createAndAddAtomicValues(DataGroup validationOrder) {
+		validationOrder.addChild(DataAtomic.withNameInDataAndValue("validateLinks", validateLinks));
 		validationOrder
-				.addChild(ClientDataAtomic.withNameInDataAndValue("validateLinks", validateLinks));
-		validationOrder.addChild(
-				ClientDataAtomic.withNameInDataAndValue("metadataToValidate", "existing"));
+				.addChild(DataAtomic.withNameInDataAndValue("metadataToValidate", "existing"));
 	}
 
 	public String testValidateRecord() {
@@ -100,9 +97,9 @@ public class MetadataValidationFixture extends RecordEndpointFixture {
 	}
 
 	private void extractAndSetValidValue(String responseText) {
-		ClientDataRecord validationResultRecord = convertJsonToClientDataRecord(responseText);
+		DataRecord validationResultRecord = convertJsonToClientDataRecord(responseText);
 
-		ClientDataGroup dataGroup = validationResultRecord.getClientDataGroup();
+		DataGroup dataGroup = validationResultRecord.getDataGroup();
 		valid = dataGroup.getFirstAtomicValueWithNameInData("valid");
 	}
 

@@ -21,7 +21,7 @@ package se.uu.ub.cora.fitnesseintegration;
 
 import java.lang.reflect.Constructor;
 
-import se.uu.ub.cora.clientdata.converter.jsontojava.JsonToDataConverterFactory;
+import se.uu.ub.cora.data.converter.JsonToDataConverterFactory;
 import se.uu.ub.cora.httphandler.HttpHandlerFactory;
 
 public final class DependencyProvider {
