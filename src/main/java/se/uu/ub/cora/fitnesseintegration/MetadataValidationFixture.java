@@ -30,8 +30,8 @@ public class MetadataValidationFixture extends RecordEndpointFixture {
 
 		JsonBuilderFactory factory = new OrgJsonBuilderFactoryAdapter();
 		DataToJsonConverterFactoryImp dataToJsonConverterFactory = new DataToJsonConverterFactoryImp();
-		DataToJsonConverter converter = dataToJsonConverterFactory
-				.createForClientDataElement(factory, validationOrder);
+		DataToJsonConverter converter = dataToJsonConverterFactory.createForDataElement(factory,
+				validationOrder);
 		String validationOrderAsJson = converter.toJson();
 
 		return "{\"order\":" + validationOrderAsJson + ",	\"record\":" + jsonRecordToValidate

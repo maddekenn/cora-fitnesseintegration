@@ -19,9 +19,8 @@
 
 package se.uu.ub.cora.fitnesseintegration;
 
-import se.uu.ub.cora.clientdata.converter.jsontojava.JsonToDataActionLinkConverter;
-import se.uu.ub.cora.clientdata.converter.jsontojava.JsonToDataConverter;
-import se.uu.ub.cora.clientdata.converter.jsontojava.JsonToDataConverterFactory;
+import se.uu.ub.cora.data.converter.JsonToDataConverter;
+import se.uu.ub.cora.data.converter.JsonToDataConverterFactory;
 import se.uu.ub.cora.json.parser.JsonValue;
 
 public class JsonToDataConverterFactorySpy implements JsonToDataConverterFactory {
@@ -41,27 +40,27 @@ public class JsonToDataConverterFactorySpy implements JsonToDataConverterFactory
 		return factored;
 	}
 
-	@Override
-	public JsonToDataConverter createForJsonString(String json) {
-		if ("validatorSpy".equals(typeToFactor)) {
-			factored = new JsonToDataConverterForValidationSpy(json);
-			((JsonToDataConverterForValidationSpy) factored).isValid = isValid;
-		} else {
-			factored = new JsonToDataConverterSpy(json);
-		}
-		return factored;
-	}
+	// @Override
+	// public JsonToDataConverter createForJsonString(String json) {
+	// if ("validatorSpy".equals(typeToFactor)) {
+	// factored = new JsonToDataConverterForValidationSpy(json);
+	// ((JsonToDataConverterForValidationSpy) factored).isValid = isValid;
+	// } else {
+	// factored = new JsonToDataConverterSpy(json);
+	// }
+	// return factored;
+	// }
 
-	@Override
-	public JsonToDataActionLinkConverter createActionLinksConverterForJsonString(String json) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	// @Override
+	// public JsonToDataActionLinkConverter createActionLinksConverterForJsonString(String json) {
+	// // TODO Auto-generated method stub
+	// return null;
+	// }
 
-	@Override
-	public JsonToDataActionLinkConverter createJsonToDataActionLinkConverterForJsonObject(
-			JsonValue jsonValue) {
-		return new JsonToDataActionLinkConverterSpy(jsonValue);
-	}
+	// @Override
+	// public JsonToDataActionLinkConverter createJsonToDataActionLinkConverterForJsonObject(
+	// JsonValue jsonValue) {
+	// return new JsonToDataActionLinkConverterSpy(jsonValue);
+	// }
 
 }
