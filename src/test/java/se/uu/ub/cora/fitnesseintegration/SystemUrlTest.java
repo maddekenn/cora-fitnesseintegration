@@ -24,8 +24,6 @@ import static org.testng.Assert.assertNotNull;
 
 import org.testng.annotations.Test;
 
-import se.uu.ub.cora.fitnesseintegration.SystemUrl;
-
 public class SystemUrlTest {
 
 	@Test
@@ -36,13 +34,26 @@ public class SystemUrlTest {
 
 	@Test
 	public void testGetUrl() {
-		SystemUrl.setUrl("someUrl");
-		assertEquals(SystemUrl.getUrl(), "someUrl");
+		SystemUrl.setUrl("http://localhost:8080/systemone/");
+		assertEquals(SystemUrl.getUrl(), "http://localhost:8080/systemone/");
 	}
 
 	@Test
 	public void testGetAppTokenVerifierUrl() {
-		SystemUrl.setAppTokenVerifierUrl("appTokenVerifierUrl");
-		assertEquals(SystemUrl.getAppTokenVerifierUrl(), "appTokenVerifierUrl");
+		SystemUrl.setAppTokenVerifierUrl("http://localhost:8180/apptokenverifier/");
+		assertEquals(SystemUrl.getAppTokenVerifierUrl(), "http://localhost:8180/apptokenverifier/");
+	}
+
+	@Test
+	public void testGetIdpLoginUrl() {
+		SystemUrl.setIdpLoginUrl("http://localhost:8380/idplogin/");
+		assertEquals(SystemUrl.getIdpLoginUrl(), "http://localhost:8380/idplogin/");
+	}
+
+	@Test
+	public void testGetGatekeeperServerUrl() {
+		SystemUrl.setGatekeeperServerUrl("http://localhost:8281/gatekeeperserver/rest/authToken");
+		assertEquals(SystemUrl.getGatekeeperServerUrl(),
+				"http://localhost:8281/gatekeeperserver/rest/authToken");
 	}
 }
