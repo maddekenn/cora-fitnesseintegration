@@ -61,9 +61,9 @@ public class IdpLoginServletFixture {
 	private void parseInformationFromAnswer() {
 		idFromLogin = tryToGetFirstMatchFromAnswerUsingRegEx("userId\" : \"");
 		authToken = tryToGetFirstMatchFromAnswerUsingRegEx("token\" : \"");
-		decodeJavascriptEncodedAuthToken();
 		validForNoSeconds = tryToGetFirstMatchFromAnswerUsingRegEx("validForNoSeconds\" : \"");
 		deleteUrl = tryToGetFirstMatchFromAnswerUsingRegEx("url\" : \"");
+		decodeJavascriptEncoded();
 	}
 
 	private String tryToGetFirstMatchFromAnswerUsingRegEx(String regEx) {
@@ -83,8 +83,9 @@ public class IdpLoginServletFixture {
 		return matcher.group(regExGroupMatchingValue);
 	}
 
-	private void decodeJavascriptEncodedAuthToken() {
+	private void decodeJavascriptEncoded() {
 		authToken = authToken.replace("\\", "");
+		deleteUrl = deleteUrl.replace("\\", "");
 	}
 
 	public String getIdFromLogin() {

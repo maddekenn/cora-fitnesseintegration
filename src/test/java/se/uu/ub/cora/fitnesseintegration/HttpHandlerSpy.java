@@ -39,7 +39,7 @@ public class HttpHandlerSpy implements HttpHandler {
 	public String idFromLogin = "other@user.domain.org";
 	public String authToken = "a8675062\\-a00d\\-4f6b\\-ada3\\-510934ad779d";
 	public String validForNoSeconds = "600";
-	public String deleteUrl = "http://localhost:8180/apptokenverifier/rest/apptoken/141414";
+	public String deleteUrl = "http:\\/\\/localhost:8180\\/apptokenverifier\\/rest\\/apptoken\\/141414";
 	public String mainSystemDomain;
 
 	private HttpHandlerSpy(HttpURLConnection httpUrlConnection) {
