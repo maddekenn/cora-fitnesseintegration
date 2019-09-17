@@ -37,9 +37,9 @@ public class HttpHandlerSpy implements HttpHandler {
 	public String responseText = "Everything ok";
 
 	public String idFromLogin = "other@user.domain.org";
-	public String authToken = "a8675062\\-a00d\\-4f6b\\-ada3\\-510934ad779d";
+	public String authTokenJsEscaped = "a8675062\\-a00d\\-4f6b\\-ada3\\-510934ad779d";
 	public String validForNoSeconds = "600";
-	public String deleteUrl = "http:\\/\\/localhost:8180\\/apptokenverifier\\/rest\\/apptoken\\/141414";
+	public String deleteUrlJsEscaped = "http:\\/\\/localhost:8180\\/apptokenverifier\\/rest\\/apptoken\\/141414";
 	public String mainSystemDomain;
 
 	private HttpHandlerSpy(HttpURLConnection httpUrlConnection) {
@@ -104,7 +104,7 @@ public class HttpHandlerSpy implements HttpHandler {
 		answer.append("var authInfo = {");
 		answer.append("\"userId\" : \"" + idFromLogin + "\",");
 		answer.append("\"token\" : \"");
-		answer.append(authToken);
+		answer.append(authTokenJsEscaped);
 		answer.append("\",");
 		answer.append("\"idFromLogin\" : \"");
 		answer.append(idFromLogin);
@@ -116,7 +116,7 @@ public class HttpHandlerSpy implements HttpHandler {
 		answer.append("\"delete\" : {");
 		answer.append("\"requestMethod\" : \"DELETE\",");
 		answer.append("\"rel\" : \"delete\",");
-		answer.append("\"url\" : \"" + deleteUrl);
+		answer.append("\"url\" : \"" + deleteUrlJsEscaped);
 		answer.append("\"");
 		answer.append("}");
 		answer.append("}");
