@@ -156,7 +156,7 @@ public class RecordEndpointFixture {
 	public String testReadRecordList() throws UnsupportedEncodingException {
 		String url = baseUrl + type;
 		if (json != null) {
-			url += "?filter=" + URLEncoder.encode(json, "UTF-8");
+			url += "?filter=" + URLEncoder.encode(json, StandardCharsets.UTF_8.name());
 		}
 		return getResponseTextOrErrorTextFromUrl(url);
 	}
@@ -380,7 +380,7 @@ public class RecordEndpointFixture {
 
 	private HttpHandler setupHttpHandlerForSearch() throws UnsupportedEncodingException {
 		String url = baseUrl + "searchResult" + "/" + searchId + "/";
-		url += "?searchData=" + URLEncoder.encode(json, "UTF-8");
+		url += "?searchData=" + URLEncoder.encode(json, StandardCharsets.UTF_8.name());
 		HttpHandler httpHandler = createHttpHandlerWithAuthTokenAndUrl(url);
 		httpHandler.setRequestMethod("GET");
 		return httpHandler;
