@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata type="textVariable">
+<recordInfo>
+<id>someTextVar</id>
+<dataDivider>
+<linkedRecordType>system</linkedRecordType>
+<linkedRecordId>cora</linkedRecordId>
+</dataDivider>
+</recordInfo>
+<nameInData>someText</nameInData>
+<textId>
+<linkedRecordType>text</linkedRecordType>
+<linkedRecordId>someTestText</linkedRecordId>
+</textId>
+<defTextId>
+<linkedRecordType>text</linkedRecordType>
+<linkedRecordId>someTestDefText</linkedRecordId>
+</defTextId>
+<regEx>^[r]{4}$</regEx>
+</metadata>

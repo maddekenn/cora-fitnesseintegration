@@ -63,6 +63,7 @@ public class RecordEndpointFixture {
 	private HttpHandlerFactory httpHandlerFactory;
 	private String token;
 	private JsonToDataConverterFactory jsonToDataConverterFactory;
+	private String xml;
 
 	public RecordEndpointFixture() {
 		httpHandlerFactory = DependencyProvider.getHttpHandlerFactory();
@@ -162,7 +163,8 @@ public class RecordEndpointFixture {
 	}
 
 	public String testCreateRecord() {
-		HttpHandler httpHandler = setUpHttpHandlerForCreate();
+		HttpHandler httpHandler = setUpHttpHandlerForCreateWithAcceptAndOutput(
+				APPLICATION_UUB_RECORD_JSON, json);
 
 		statusType = Response.Status.fromStatusCode(httpHandler.getResponseCode());
 		if (statusType.equals(Response.Status.CREATED)) {
@@ -175,18 +177,34 @@ public class RecordEndpointFixture {
 		return httpHandler.getErrorText();
 	}
 
-	private HttpHandler setUpHttpHandlerForCreate() {
+	public String testCreateRecordUsingXML() {
 		String url = baseUrl + type;
-		return createHttpHandlerForPostWithUrlAndContentType(url, APPLICATION_UUB_RECORD_JSON);
+		HttpHandler httpHandler = httpHandlerFactory.factor(url);
+		return httpHandler.getResponseText();
+	}
+
+	private HttpHandler setUpHttpHandlerForCreateWithAcceptAndOutput(String accept, String output) {
+		String url = baseUrl + type;
+		return createHttpHandlerForPostWithUrlAndContentType(url, accept, output);
 	}
 
 	protected HttpHandler createHttpHandlerForPostWithUrlAndContentType(String url,
 			String contentType) {
+		return createHttpHandlerForPostWithUrlAndAcceptAndOutput(url, contentType, json);
+	}
+
+	protected HttpHandler createHttpHandlerForPostWithUrlAndContentType(String url,
+			String contentType, String output) {
+		return createHttpHandlerForPostWithUrlAndAcceptAndOutput(url, contentType, output);
+	}
+
+	private HttpHandler createHttpHandlerForPostWithUrlAndAcceptAndOutput(String url, String accept,
+			String output) {
 		HttpHandler httpHandler = createHttpHandlerWithAuthTokenAndUrl(url);
 		httpHandler.setRequestMethod("POST");
-		httpHandler.setRequestProperty(ACCEPT, APPLICATION_UUB_RECORD_JSON);
-		httpHandler.setRequestProperty("Content-Type", contentType);
-		httpHandler.setOutput(json);
+		httpHandler.setRequestProperty(ACCEPT, accept);
+		httpHandler.setRequestProperty("Content-Type", APPLICATION_UUB_RECORD_JSON);
+		httpHandler.setOutput(output);
 		return httpHandler;
 	}
 
@@ -209,7 +227,8 @@ public class RecordEndpointFixture {
 	}
 
 	public String testCreateRecordCreatedType() {
-		HttpHandler httpHandler = setUpHttpHandlerForCreate();
+		HttpHandler httpHandler = setUpHttpHandlerForCreateWithAcceptAndOutput(
+				APPLICATION_UUB_RECORD_JSON, json);
 
 		statusType = Response.Status.fromStatusCode(httpHandler.getResponseCode());
 		if (statusType.equals(Response.Status.CREATED)) {
@@ -273,7 +292,7 @@ public class RecordEndpointFixture {
 	public String testUpdateRecord() {
 		String url = baseUrl + type + "/" + id;
 		HttpHandler httpHandler = createHttpHandlerForPostWithUrlAndContentType(url,
-				APPLICATION_UUB_RECORD_JSON);
+				APPLICATION_UUB_RECORD_JSON, json);
 		statusType = Response.Status.fromStatusCode(httpHandler.getResponseCode());
 
 		if (responseIsOk()) {
@@ -408,4 +427,10 @@ public class RecordEndpointFixture {
 	public JsonToDataConverterFactory getJsonToDataConverterFactory() {
 		return jsonToDataConverterFactory;
 	}
+
+	public void setXml(String xml) {
+		this.xml = xml;
+
+	}
+
 }
