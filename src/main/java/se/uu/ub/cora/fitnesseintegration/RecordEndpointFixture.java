@@ -46,6 +46,7 @@ public class RecordEndpointFixture {
 	private static final int DISTANCE_TO_START_OF_TOKEN = 24;
 	private static final int DISTANCE_TO_START_OF_ID = 19;
 	private static final String APPLICATION_UUB_RECORD_JSON = "application/vnd.uub.record+json";
+	private static final String APPLICATION_UUB_RECORD_XML = "application/vnd.uub.record+xml";
 	private static final String ACCEPT = "Accept";
 	private String id;
 	private String searchId;
@@ -179,7 +180,11 @@ public class RecordEndpointFixture {
 
 	public String testCreateRecordUsingXML() {
 		String url = baseUrl + type;
-		HttpHandler httpHandler = httpHandlerFactory.factor(url);
+		HttpHandler httpHandler = createHttpHandlerForPostWithUrlAndAcceptAndOutput(url,
+				APPLICATION_UUB_RECORD_XML, xml);
+		String responseText = httpHandler.getResponseText();
+		createdId = extractCreatedIdFromLocationHeader(httpHandler.getHeaderField("Location"));
+		token = tryToExtractCreatedTokenFromResponseText(responseText);
 		return httpHandler.getResponseText();
 	}
 
@@ -429,8 +434,13 @@ public class RecordEndpointFixture {
 	}
 
 	public void setXml(String xml) {
-		this.xml = xml;
+		this.xml = removeExtraFormatingAddedByFitnesse(xml);
 
 	}
 
+	private String removeExtraFormatingAddedByFitnesse(String alvinXML) {
+		// String tempXml = alvinXML.replaceAll("<pre>", "").replaceAll("</pre>", "");
+		// return StringEscapeUtils.unescapeHtml4(tempXml);
+		return alvinXML.replace("<pre>", "").replace("</pre>", "");
+	}
 }

@@ -422,42 +422,43 @@ public class RecordEndpointFixtureTest {
 		assertTrue(RecordHolder.getRecord() instanceof ClientDataRecord);
 	}
 
-	// @Test
-	// public void testCreateUsingXMlSetsUpHttpFactoryCorrectly() {
-	// httpHandlerFactorySpy.setResponseCode(201);
-	// fixture.setType("appToken");
-	// fixture.setAuthToken("someToken");
-	// fixture.setXml("<pre>some xml</pre>");
-	// fixture.testCreateRecordUsingXML();
-	// HttpHandlerSpy httpHandlerSpy = httpHandlerFactorySpy.httpHandlerSpy;
-	// assertEquals(httpHandlerSpy.requestMetod, "POST");
-	// assertEquals(httpHandlerSpy.outputString, "<pre>some xml</pre>");
-	// assertEquals(httpHandlerSpy.requestProperties.get("Accept"),
-	// "application/vnd.uub.record+xml");
-	// // TODO:man bör väl få tillbaka xml men för att inte behöva lösa det på en gång så får man
-	// // tillsvidare tillbaka json
-	// assertEquals(httpHandlerSpy.requestProperties.get("Content-Type"),
-	// "application/vnd.uub.record+json");
-	// assertEquals(httpHandlerSpy.requestProperties.get("authToken"), "someToken");
-	// assertEquals(httpHandlerSpy.requestProperties.size(), 3);
-	// assertEquals(httpHandlerFactorySpy.urlString,
-	// "http://localhost:8080/therest/rest/record/appToken");
-	// assertEquals(fixture.getCreatedId(), "someRecordType:35824453170224822");
-	// assertEquals(fixture.getToken(), "ba064c86-bd7c-4283-a5f3-86ba1dade3f3");
-	// }
+	@Test
+	public void testCreateUsingXMlSetsUpHttpFactoryCorrectly() {
+		httpHandlerFactorySpy.setResponseCode(201);
+		fixture.setType("appToken");
+		fixture.setAuthToken("someToken");
+		fixture.setXml("<pre>some xml</pre>");
+		fixture.testCreateRecordUsingXML();
+		HttpHandlerSpy httpHandlerSpy = httpHandlerFactorySpy.httpHandlerSpy;
+		assertEquals(httpHandlerSpy.requestMetod, "POST");
+		assertEquals(httpHandlerSpy.outputString, "<pre>some xml</pre>");
+		assertEquals(httpHandlerSpy.requestProperties.get("Accept"),
+				"application/vnd.uub.record+xml");
+		// TODO:man bör väl få tillbaka xml men för att inte behöva lösa det på en gång så får man
+		// tillsvidare tillbaka json
+		assertEquals(httpHandlerSpy.requestProperties.get("Content-Type"),
+				"application/vnd.uub.record+json");
+		assertEquals(httpHandlerSpy.requestProperties.get("authToken"), "someToken");
+		assertEquals(httpHandlerSpy.requestProperties.size(), 3);
+		assertEquals(httpHandlerFactorySpy.urlString,
+				"http://localhost:8080/therest/rest/record/appToken");
+		assertEquals(fixture.getCreatedId(), "someRecordType:35824453170224822");
+		assertEquals(fixture.getToken(), "ba064c86-bd7c-4283-a5f3-86ba1dade3f3");
+	}
 
-	// @Test
-	// public void testPreIsRemovedXMLIsSentToConverter() throws Exception {
-	// String alvinXML = "<pre>some xml</pre>";
-	// fixture.setAlvinXML(alvinXML);
-	// fixture.getJson();
-	// assertEquals(converterFactorySpy.converterSpy.xml, "some xml");
-	// }
+	@Test
+	public void testPreIsRemovedXMLIsSentToCreate() throws Exception {
+		String xml = "<pre>some xml</pre>";
+		fixture.setXml(xml);
+		fixture.testCreateRecordUsingXML();
+		HttpHandlerSpy httpHandlerSpy = httpHandlerFactorySpy.httpHandlerSpy;
+		assertEquals(httpHandlerSpy.outputString, "some xml");
+	}
 
-	// @Test
-	// public void testCreateUsingXML() {
-	// httpHandlerFactorySpy.setResponseCode(201);
-	// assertEquals(fixture.testCreateRecordUsingXML(), "Everything ok");
-	// }
+	@Test
+	public void testCreateUsingXML() {
+		httpHandlerFactorySpy.setResponseCode(201);
+		assertEquals(fixture.testCreateRecordUsingXML(), "Everything ok");
+	}
 
 }
