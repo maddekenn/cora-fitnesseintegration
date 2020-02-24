@@ -29,8 +29,11 @@ import java.nio.charset.StandardCharsets;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.StatusType;
 
+import se.uu.ub.cora.clientdata.ClientDataElement;
+import se.uu.ub.cora.clientdata.ClientDataGroup;
 import se.uu.ub.cora.clientdata.ClientDataRecord;
 import se.uu.ub.cora.clientdata.converter.jsontojava.JsonToDataConverterFactory;
+import se.uu.ub.cora.clientdata.converter.jsontojava.JsonToDataGroupConverter;
 import se.uu.ub.cora.clientdata.converter.jsontojava.JsonToDataRecordConverter;
 import se.uu.ub.cora.httphandler.HttpHandler;
 import se.uu.ub.cora.httphandler.HttpHandlerFactory;
@@ -63,6 +66,8 @@ public class RecordEndpointFixture {
 	private HttpHandlerFactory httpHandlerFactory;
 	private String token;
 	private JsonToDataConverterFactory jsonToDataConverterFactory;
+	private String readJson;
+	private String childrenToLookFor;
 
 	public RecordEndpointFixture() {
 		httpHandlerFactory = DependencyProvider.getHttpHandlerFactory();
@@ -119,8 +124,8 @@ public class RecordEndpointFixture {
 
 	public String testReadRecord() {
 		String url = baseUrl + type + "/" + id;
-
-		return getResponseTextOrErrorTextFromUrl(url);
+		readJson = getResponseTextOrErrorTextFromUrl(url);
+		return readJson;
 	}
 
 	private String getResponseTextOrErrorTextFromUrl(String url) {
@@ -407,5 +412,41 @@ public class RecordEndpointFixture {
 
 	public JsonToDataConverterFactory getJsonToDataConverterFactory() {
 		return jsonToDataConverterFactory;
+	}
+
+	public void lookFor(String childrenToLookFor) {
+		this.childrenToLookFor = childrenToLookFor;
+	}
+
+	public String jsonContainsChildren() {
+		String responseText = testReadRecord();
+
+		ClientDataRecord clientDataRecord = convertJsonToClientDataRecord(responseText);
+		ClientDataGroup clientDataGroup = clientDataRecord.getClientDataGroup();
+
+		JsonObject jsonObject = createJsonObjectFromResponseText(childrenToLookFor);
+		JsonToDataGroupConverter converter = JsonToDataGroupConverter
+				.forJsonObjectUsingConverterFactory(jsonObject, jsonToDataConverterFactory);
+		ClientDataGroup lookForDataGroupStructure = (ClientDataGroup) converter.toInstance();
+
+		for (ClientDataElement dataElementChild : lookForDataGroupStructure.getChildren()) {
+			if (!clientDataGroup.containsChildWithNameInData(dataElementChild.getNameInData())) {
+				return "no";
+			}
+		}
+
+		// String[] split = childrenToLookFor.split("=");
+		// String nameInData = split[0];
+		// if (clientDataGroup.containsChildWithNameInData(nameInData)) {
+		// ClientDataElement firstChildWithNameInData = clientDataGroup
+		// .getFirstChildWithNameInData(nameInData);
+		// ClientDataAtomic dataAtomic = (ClientDataAtomic) firstChildWithNameInData;
+		// if (dataAtomic.getValue().equals(split[1])) {
+		// return "yes";
+		// }
+		//
+		// }
+
+		return "yes";
 	}
 }

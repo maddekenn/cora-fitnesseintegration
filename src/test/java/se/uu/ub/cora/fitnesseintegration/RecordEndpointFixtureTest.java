@@ -422,4 +422,22 @@ public class RecordEndpointFixtureTest {
 		assertTrue(RecordHolder.getRecord() instanceof ClientDataRecord);
 	}
 
+	@Test
+	public void testJsonDoesNotContainChildren() {
+		fixture.setType("someRecordType");
+		fixture.setId("someRecordId");
+		fixture.lookFor(
+				"{\"name\":\"example\",\"children\":[{\"name\":\"NOTrecordInfo\",\"children\":[]}]}");
+		assertEquals(fixture.jsonContainsChildren(), "no");
+	}
+
+	@Test
+	public void testJsonDoesContainChildGroupFirstLevel() {
+		fixture.setType("someRecordType");
+		fixture.setId("someRecordId");
+		fixture.lookFor(
+				"{\"name\":\"example\",\"children\":[{\"name\":\"recordInfo\",\"children\":[]}]}");
+		assertEquals(fixture.jsonContainsChildren(), "yes");
+	}
+
 }
