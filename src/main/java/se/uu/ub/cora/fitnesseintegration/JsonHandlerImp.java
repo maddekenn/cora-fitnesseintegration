@@ -36,7 +36,7 @@ public class JsonHandlerImp implements JsonHandler {
 	}
 
 	@Override
-	public JsonValue getStringAsValue(String jsonString) {
+	public JsonValue parseStringAsValue(String jsonString) {
 		return jsonParser.parseString(jsonString);
 	}
 

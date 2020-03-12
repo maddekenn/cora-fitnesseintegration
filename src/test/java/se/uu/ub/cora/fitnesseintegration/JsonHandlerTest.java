@@ -47,7 +47,7 @@ public class JsonHandlerTest {
 	@Test
 	public void testGetAsValue() {
 		String jsonString = "{\"example\":[{\"textVariable\":\"someTextId\"}]}";
-		JsonValue jsonValue = jsonHandler.getStringAsValue(jsonString);
+		JsonValue jsonValue = jsonHandler.parseStringAsValue(jsonString);
 		assertEquals(jsonString, jsonParser.jsonStringSentToParser);
 		assertSame(jsonParser.jsonValueSpy, jsonValue);
 	}

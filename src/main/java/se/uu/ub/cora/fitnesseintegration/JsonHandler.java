@@ -27,7 +27,7 @@ public interface JsonHandler {
 
 	JsonParser getJsonParser();
 
-	JsonValue getStringAsValue(String jsonString);
+	JsonValue parseStringAsValue(String jsonString);
 
 	JsonObject parseStringAsObject(String jsonString);
 

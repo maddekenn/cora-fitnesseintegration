@@ -63,6 +63,7 @@ public class RecordEndpointFixture {
 	private HttpHandlerFactory httpHandlerFactory;
 	private String token;
 	private JsonToDataConverterFactory jsonToDataConverterFactory;
+	private JsonHandler jsonHandler;
 
 	public RecordEndpointFixture() {
 		httpHandlerFactory = DependencyProvider.getHttpHandlerFactory();
@@ -410,12 +411,14 @@ public class RecordEndpointFixture {
 	}
 
 	public String testReadCheckContain() {
-		String testReadRecord = testReadRecord();
-		JsonObject recordJsonObject = createJsonObjectFromResponseText(testReadRecord);
+		String readJson = testReadRecord();
+		// JsonObject recordJsonObject = createJsonObjectFromResponseText(testReadRecord);
 		// JsonParser jsonParser = new OrgJsonParser();
 		// JsonValue jsonValue = jsonParser.parseString(responseText);
+		JsonObject jsonObject = jsonHandler.parseStringAsObject(readJson);
+
 		JsonToDataRecordConverter converter = JsonToDataRecordConverter
-				.forJsonObjectUsingConverterFactory(recordJsonObject, jsonToDataConverterFactory);
+				.forJsonObjectUsingConverterFactory(jsonObject, jsonToDataConverterFactory);
 		converter.toInstance();
 		return "OK";
 	}
@@ -423,5 +426,9 @@ public class RecordEndpointFixture {
 	public String setChildren(String children) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	public void setJsonHandler(JsonHandler jsonHandler) {
+		this.jsonHandler = jsonHandler;
 	}
 }
