@@ -29,9 +29,11 @@ public class JsonToDataConverterFactorySpy implements JsonToDataConverterFactory
 	public JsonToDataConverter factored;
 	public String typeToFactor = "";
 	public String isValid = "true";
+	public JsonValue jsonValueSentToConverter;
 
 	@Override
 	public JsonToDataConverter createForJsonObject(JsonValue jsonValue) {
+		this.jsonValueSentToConverter = jsonValue;
 		if ("validatorSpy".equals(typeToFactor)) {
 			factored = new JsonToDataConverterForValidationSpy(jsonValue);
 			((JsonToDataConverterForValidationSpy) factored).isValid = isValid;

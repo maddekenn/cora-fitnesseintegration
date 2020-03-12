@@ -408,4 +408,20 @@ public class RecordEndpointFixture {
 	public JsonToDataConverterFactory getJsonToDataConverterFactory() {
 		return jsonToDataConverterFactory;
 	}
+
+	public String testReadCheckContain() {
+		String testReadRecord = testReadRecord();
+		JsonObject recordJsonObject = createJsonObjectFromResponseText(testReadRecord);
+		// JsonParser jsonParser = new OrgJsonParser();
+		// JsonValue jsonValue = jsonParser.parseString(responseText);
+		JsonToDataRecordConverter converter = JsonToDataRecordConverter
+				.forJsonObjectUsingConverterFactory(recordJsonObject, jsonToDataConverterFactory);
+		converter.toInstance();
+		return "OK";
+	}
+
+	public String setChildren(String children) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

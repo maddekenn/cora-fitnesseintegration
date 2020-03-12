@@ -33,6 +33,9 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import se.uu.ub.cora.clientdata.ClientDataRecord;
+import se.uu.ub.cora.json.parser.JsonParser;
+import se.uu.ub.cora.json.parser.JsonValue;
+import se.uu.ub.cora.json.parser.org.OrgJsonParser;
 
 public class RecordEndpointFixtureTest {
 	private RecordEndpointFixture fixture;
@@ -420,6 +423,31 @@ public class RecordEndpointFixtureTest {
 
 		assertNotEquals(RecordHolder.getRecord(), null);
 		assertTrue(RecordHolder.getRecord() instanceof ClientDataRecord);
+	}
+
+	@Test
+	public void testSetContainsChildrenOk() {
+		fixture.setType("someCheckChildrenOkType");
+		fixture.setId("someId");
+		fixture.setAuthToken("someToken");
+		fixture.setChildren("{\"doesContain\":[{\"textVariable\":\"workoutName\"}]}");
+		assertEquals(fixture.testReadCheckContain(), "OK");
+		JsonToDataConverterFactorySpy converterFactory = (JsonToDataConverterFactorySpy) DependencyProvider
+				.getJsonToDataConverterFactory();
+		String responseTextFromHttpSpy = httpHandlerFactorySpy.httpHandlerSpy.responseText;
+		JsonValue jsonValueSentToConverter = converterFactory.jsonValueSentToConverter;
+
+		JsonParser jsonParser = new OrgJsonParser();
+		JsonValue responseTextAsJsonValue = jsonParser.parseString(responseTextFromHttpSpy);
+
+		assertEquals(jsonValueSentToConverter, responseTextAsJsonValue);
+		// assertEquals(fixture.getStatusType(), Response.Status.OK);
+	}
+
+	@Test
+	public void testReadCheckContainOk() {
+		assertEquals(fixture.testReadCheckContain(), "OK");
+		// assertEquals(fixture.getStatusType(), Response.Status.OK);
 	}
 
 }
