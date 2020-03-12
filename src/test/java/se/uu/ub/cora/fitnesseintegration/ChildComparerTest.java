@@ -28,6 +28,8 @@ import org.testng.annotations.Test;
 
 import se.uu.ub.cora.clientdata.ClientDataAtomic;
 import se.uu.ub.cora.clientdata.ClientDataGroup;
+import se.uu.ub.cora.clientdata.ClientDataRecordLink;
+import se.uu.ub.cora.clientdata.ClientDataResourceLink;
 
 public class ChildComparerTest {
 
@@ -42,6 +44,40 @@ public class ChildComparerTest {
 		ClientDataGroup bookGroup = ClientDataGroup.withNameInData("book");
 		bookGroup.addChild(ClientDataGroup.withNameInData("recordInfo"));
 		return bookGroup;
+	}
+
+	@Test
+	public void testDoContainGroupOnTopLevel() {
+		ClientDataGroup expectedGroup = createBookDataGroupWithRecordInfo();
+
+		ChildComparer childComparer = new ChildComparer();
+		assertTrue(childComparer.allChildrenExist(bookGroup, expectedGroup).isEmpty());
+	}
+
+	@Test
+	public void testDoContainGroupOnTopLevelButAlsoDataAtomic() {
+		bookGroup.addChild(
+				ClientDataAtomic.withNameInDataAndValue("recordInfo", "recordInfoAtomic"));
+
+		ClientDataGroup expectedGroup = ClientDataGroup.withNameInData("book");
+		expectedGroup.addChild(
+				ClientDataAtomic.withNameInDataAndValue("recordInfo", "recordInfoAtomic"));
+
+		ChildComparer childComparer = new ChildComparer();
+		assertTrue(childComparer.allChildrenExist(bookGroup, expectedGroup).isEmpty());
+	}
+
+	@Test
+	public void testDoContainRecordLinkOnTopLevel() {
+		ClientDataGroup bookGroup = ClientDataGroup.withNameInData("book");
+		bookGroup.addChild(ClientDataRecordLink.withNameInData("someLink"));
+
+		ClientDataGroup expectedGroup = ClientDataGroup.withNameInData("book");
+		ClientDataRecordLink childRecordLink = ClientDataRecordLink.withNameInData("someLink");
+		expectedGroup.addChild(childRecordLink);
+
+		ChildComparer childComparer = new ChildComparer();
+		assertTrue(childComparer.allChildrenExist(bookGroup, expectedGroup).isEmpty());
 	}
 
 	@Test
@@ -81,18 +117,32 @@ public class ChildComparerTest {
 		assertEquals(errorMessages.get(0), "child with nameInData recordInfo does not exist");
 	}
 
+	@Test
+	public void testDoContainOnTopLevelButWrongElementTypeRecordLinkVsDataGroup() {
+		ClientDataGroup childrenToCompareTo = ClientDataGroup.withNameInData("book");
+		childrenToCompareTo.addChild(ClientDataRecordLink.withNameInData("recordInfo"));
+
+		ChildComparer childComparer = new ChildComparer();
+		List<String> errorMessages = childComparer.allChildrenExist(bookGroup, childrenToCompareTo);
+		assertEquals(errorMessages.size(), 1);
+		assertEquals(errorMessages.get(0), "child with nameInData recordInfo does not exist");
+	}
+
+	@Test
+	public void testDoContainOnTopLevelButWrongElementTypeResourceLinkVsDataGroup() {
+		ClientDataGroup childrenToCompareTo = ClientDataGroup.withNameInData("book");
+		childrenToCompareTo.addChild(ClientDataResourceLink.withNameInData("recordInfo"));
+
+		ChildComparer childComparer = new ChildComparer();
+		List<String> errorMessages = childComparer.allChildrenExist(bookGroup, childrenToCompareTo);
+		assertEquals(errorMessages.size(), 1);
+		assertEquals(errorMessages.get(0), "child with nameInData recordInfo does not exist");
+	}
+
 	private ClientDataGroup createBookDataGroupWithRecordInfo() {
 		ClientDataGroup childrenToCompareTo = ClientDataGroup.withNameInData("book");
 		childrenToCompareTo.addChild(ClientDataGroup.withNameInData("recordInfo"));
 		return childrenToCompareTo;
-	}
-
-	@Test
-	public void testDoContainGroupOnTopLevel() {
-		ClientDataGroup expectedGroup = createBookDataGroupWithRecordInfo();
-
-		ChildComparer childComparer = new ChildComparer();
-		assertTrue(childComparer.allChildrenExist(bookGroup, expectedGroup).isEmpty());
 	}
 
 	@Test

@@ -23,6 +23,8 @@ import java.util.List;
 
 import se.uu.ub.cora.clientdata.ClientDataElement;
 import se.uu.ub.cora.clientdata.ClientDataGroup;
+import se.uu.ub.cora.clientdata.ClientDataRecordLink;
+import se.uu.ub.cora.clientdata.ClientDataResourceLink;
 
 public class ChildComparer {
 
@@ -37,8 +39,8 @@ public class ChildComparer {
 
 	}
 
-	private void checkExpectedChild(ClientDataElement expectedChild, ClientDataGroup existingTopDataGroup,
-			List<String> errorList) {
+	private void checkExpectedChild(ClientDataElement expectedChild,
+			ClientDataGroup existingTopDataGroup, List<String> errorList) {
 		String expectedNameInData = expectedChild.getNameInData();
 		if (noChildWithNameInDataInGroup(expectedNameInData, existingTopDataGroup)) {
 			addChildNotDoesExistError(errorList, expectedNameInData);
@@ -58,8 +60,8 @@ public class ChildComparer {
 		errorList.add("child with nameInData " + expectedNameInData + " does not exist");
 	}
 
-	private void checkExistingChild(ClientDataElement expectedChild, ClientDataElement existingChild,
-			List<String> errorList) {
+	private void checkExistingChild(ClientDataElement expectedChild,
+			ClientDataElement existingChild, List<String> errorList) {
 		if (childrenAreDifferentTypes(expectedChild, existingChild)) {
 			addChildNotDoesExistError(errorList, expectedChild.getNameInData());
 		} else {
@@ -102,6 +104,12 @@ public class ChildComparer {
 	}
 
 	public String getType(ClientDataElement dataElement) {
+		if (dataElement instanceof ClientDataRecordLink) {
+			return "dataRecordLink";
+		}
+		if (dataElement instanceof ClientDataResourceLink) {
+			return "resourceLink";
+		}
 		if (dataElementIsGroup(dataElement)) {
 			return "dataGroup";
 		}
