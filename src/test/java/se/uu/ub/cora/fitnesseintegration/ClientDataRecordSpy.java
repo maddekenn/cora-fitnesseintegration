@@ -24,7 +24,7 @@ import se.uu.ub.cora.clientdata.DataRecord;
 
 public class ClientDataRecordSpy implements DataRecord, ClientData {
 
-	private ClientDataGroup clientDataGroup;
+	public ClientDataGroup clientDataGroup;
 
 	@Override
 	public ClientDataGroup getClientDataGroup() {

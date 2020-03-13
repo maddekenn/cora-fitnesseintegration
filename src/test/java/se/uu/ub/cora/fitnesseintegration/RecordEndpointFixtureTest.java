@@ -438,7 +438,8 @@ public class RecordEndpointFixtureTest {
 
 		fixture.setType("someCheckChildrenOkType");
 		fixture.setId("someId");
-		fixture.setChildren("{\"doesContain\":[{\"textVariable\":\"workoutName\"}]}");
+		String childrenToLookFor = "{\"doesContain\":[{\"textVariable\":\"workoutName\"}]}";
+		fixture.setChildren(childrenToLookFor);
 		assertEquals(fixture.testReadCheckContain(), "OK");
 
 		String responseTextFromHttpSpy = httpHandlerFactorySpy.httpHandlerSpy.responseText;
@@ -447,19 +448,16 @@ public class RecordEndpointFixtureTest {
 
 		assertSame(jsonToDataConverter.jsonObject, jsonParser.jsonObjectSpy);
 
-		ClientDataGroup dataGroupFromRecordSpy = jsonToDataConverter.clientDataRecordSpy
-				.getClientDataGroup();
+		ClientDataRecordSpy clientDataRecordSpy = jsonToDataConverter.clientDataRecordSpy;
+		ClientDataGroup dataGroupFromRecordSpy = clientDataRecordSpy.clientDataGroup;
+
 		ChildComparerSpy childComparer = (ChildComparerSpy) fixture.getChildComparer();
 		assertSame(childComparer.dataGroup, dataGroupFromRecordSpy);
 
-		// JsonToDataConverterSpy factored = (JsonToDataConverterSpy) converterFactory.factored;
-		// assertEquasl()
+		// json från children ska skickas till jsonHandler, och resultatet ska skickas till
 
-		// JsonParser jsonParser = new OrgJsonParser();
-		// JsonValue responseTextAsJsonValue = jsonParser.parseString(responseTextFromHttpSpy);
+		// assertSame(childComparer.jsonValue, dataGroupFromRecordSpy);
 
-		// assertEquals(jsonValueSentToConverter, responseTextAsJsonValue);
-		// assertEquals(fixture.getStatusType(), Response.Status.OK);
 	}
 
 	@Test
