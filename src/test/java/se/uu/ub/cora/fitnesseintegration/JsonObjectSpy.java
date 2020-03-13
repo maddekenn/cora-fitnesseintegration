@@ -29,6 +29,8 @@ import se.uu.ub.cora.json.parser.JsonValueType;
 
 public class JsonObjectSpy implements JsonObject {
 
+	public JsonObjectSpy jsonObjectSpy;
+
 	@Override
 	public JsonValueType getValueType() {
 		// TODO Auto-generated method stub
@@ -49,8 +51,8 @@ public class JsonObjectSpy implements JsonObject {
 
 	@Override
 	public JsonObject getValueAsJsonObject(String key) {
-		// TODO Auto-generated method stub
-		return null;
+		jsonObjectSpy = new JsonObjectSpy();
+		return jsonObjectSpy;
 	}
 
 	@Override

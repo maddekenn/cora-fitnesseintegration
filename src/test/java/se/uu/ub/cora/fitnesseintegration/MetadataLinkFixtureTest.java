@@ -140,7 +140,7 @@ public class MetadataLinkFixtureTest {
 	}
 
 	private void createAndAddSecondChild() {
-		ClientDataRecord record = RecordHolder.getRecord();
+		ClientDataRecord record = (ClientDataRecord) RecordHolder.getRecord();
 		ClientDataGroup clientDataGroup = record.getClientDataGroup();
 		ClientDataGroup childReferences = clientDataGroup
 				.getFirstGroupWithNameInData("childReferences");

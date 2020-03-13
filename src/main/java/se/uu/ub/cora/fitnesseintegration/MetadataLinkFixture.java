@@ -26,6 +26,7 @@ import se.uu.ub.cora.clientdata.ClientDataRecord;
 import se.uu.ub.cora.clientdata.RecordIdentifier;
 import se.uu.ub.cora.clientdata.converter.jsontojava.JsonToDataConverterFactory;
 import se.uu.ub.cora.clientdata.converter.jsontojava.JsonToDataRecordConverter;
+import se.uu.ub.cora.clientdata.converter.jsontojava.JsonToDataRecordConverterImp;
 import se.uu.ub.cora.httphandler.HttpHandler;
 import se.uu.ub.cora.httphandler.HttpHandlerFactory;
 import se.uu.ub.cora.json.parser.JsonObject;
@@ -81,7 +82,7 @@ public class MetadataLinkFixture {
 	}
 
 	private void possiblySetChildReferenceList() {
-		ClientDataRecord record = RecordHolder.getRecord();
+		ClientDataRecord record = (ClientDataRecord) RecordHolder.getRecord();
 		if (recordContainsDataGroup(record)) {
 			ClientDataGroup topLevelDataGroup = record.getClientDataGroup();
 			setChildReferenceList(topLevelDataGroup);
@@ -189,9 +190,10 @@ public class MetadataLinkFixture {
 
 	private String getNameInDataFromConvertedJson(String responseText) {
 		JsonObject recordJsonObject = createJsonObjectFromResponseText(responseText);
-		recordConverter = JsonToDataRecordConverter
-				.forJsonObjectUsingConverterFactory(recordJsonObject, jsonToDataConverterFactory);
-		ClientDataRecord clientDataRecord = recordConverter.toInstance();
+		recordConverter = JsonToDataRecordConverterImp
+				.forJsonObjectUsingConverterFactory(jsonToDataConverterFactory);
+		ClientDataRecord clientDataRecord = (ClientDataRecord) recordConverter
+				.toInstance(recordJsonObject);
 		return getNameInDataFromDataGroupInRecord(clientDataRecord);
 	}
 

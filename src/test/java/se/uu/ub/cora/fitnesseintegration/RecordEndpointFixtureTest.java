@@ -20,6 +20,7 @@ package se.uu.ub.cora.fitnesseintegration;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotEquals;
+import static org.testng.Assert.assertSame;
 import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
@@ -33,7 +34,6 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import se.uu.ub.cora.clientdata.ClientDataRecord;
-import se.uu.ub.cora.clientdata.converter.jsontojava.JsonToDataConverter;
 
 public class RecordEndpointFixtureTest {
 	private RecordEndpointFixture fixture;
@@ -429,18 +429,20 @@ public class RecordEndpointFixtureTest {
 		JsonHandler jsonHandler = JsonHandlerImp.usingJsonParser(jsonParser);
 		fixture.setJsonHandler(jsonHandler);
 
+		JsonToDataRecordConverterSpy jsonToDataConverter = new JsonToDataRecordConverterSpy();
+		fixture.setJsonToDataRecordConverter(jsonToDataConverter);
+
 		fixture.setType("someCheckChildrenOkType");
 		fixture.setId("someId");
-		// fixture.setAuthToken("someToken");
 		fixture.setChildren("{\"doesContain\":[{\"textVariable\":\"workoutName\"}]}");
 		assertEquals(fixture.testReadCheckContain(), "OK");
 
-		JsonToDataConverterFactorySpy converterFactory = (JsonToDataConverterFactorySpy) DependencyProvider
-				.getJsonToDataConverterFactory();
 		String responseTextFromHttpSpy = httpHandlerFactorySpy.httpHandlerSpy.responseText;
 
 		assertEquals(jsonParser.jsonStringSentToParser, responseTextFromHttpSpy);
-		JsonToDataConverter factored = converterFactory.factored;
+
+		assertSame(jsonToDataConverter.jsonObject, jsonParser.jsonObjectSpy);
+		// JsonToDataConverterSpy factored = (JsonToDataConverterSpy) converterFactory.factored;
 		// assertEquasl()
 
 		// JsonParser jsonParser = new OrgJsonParser();

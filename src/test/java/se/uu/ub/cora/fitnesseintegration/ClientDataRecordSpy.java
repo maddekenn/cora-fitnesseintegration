@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Uppsala University Library
+ * Copyright 2020 Uppsala University Library
  *
  * This file is part of Cora.
  *
@@ -18,23 +18,8 @@
  */
 package se.uu.ub.cora.fitnesseintegration;
 
+import se.uu.ub.cora.clientdata.ClientData;
 import se.uu.ub.cora.clientdata.DataRecord;
 
-public class RecordHolder {
-
-	public RecordHolder() {
-		// needed by fitnesse
-		super();
-	}
-
-	private static DataRecord clientDataRecord;
-
-	public static void setRecord(DataRecord clientDataRecord) {
-		RecordHolder.clientDataRecord = clientDataRecord;
-	}
-
-	public static DataRecord getRecord() {
-		return clientDataRecord;
-	}
-
+public class ClientDataRecordSpy implements DataRecord, ClientData {
 }

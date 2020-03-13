@@ -30,8 +30,10 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.StatusType;
 
 import se.uu.ub.cora.clientdata.ClientDataRecord;
+import se.uu.ub.cora.clientdata.DataRecord;
 import se.uu.ub.cora.clientdata.converter.jsontojava.JsonToDataConverterFactory;
 import se.uu.ub.cora.clientdata.converter.jsontojava.JsonToDataRecordConverter;
+import se.uu.ub.cora.clientdata.converter.jsontojava.JsonToDataRecordConverterImp;
 import se.uu.ub.cora.httphandler.HttpHandler;
 import se.uu.ub.cora.httphandler.HttpHandlerFactory;
 import se.uu.ub.cora.httphandler.HttpMultiPartUploader;
@@ -64,6 +66,7 @@ public class RecordEndpointFixture {
 	private String token;
 	private JsonToDataConverterFactory jsonToDataConverterFactory;
 	private JsonHandler jsonHandler;
+	private JsonToDataRecordConverter jsonToDataConverter;
 
 	public RecordEndpointFixture() {
 		httpHandlerFactory = DependencyProvider.getHttpHandlerFactory();
@@ -397,9 +400,9 @@ public class RecordEndpointFixture {
 	protected ClientDataRecord convertJsonToClientDataRecord(String responseText) {
 		JsonObject recordJsonObject = createJsonObjectFromResponseText(responseText);
 
-		JsonToDataRecordConverter converter = JsonToDataRecordConverter
-				.forJsonObjectUsingConverterFactory(recordJsonObject, jsonToDataConverterFactory);
-		return converter.toInstance();
+		JsonToDataRecordConverter converter = JsonToDataRecordConverterImp
+				.forJsonObjectUsingConverterFactory(jsonToDataConverterFactory);
+		return (ClientDataRecord) converter.toInstance(recordJsonObject);
 	}
 
 	public HttpHandlerFactory getHttpHandlerFactory() {
@@ -412,14 +415,9 @@ public class RecordEndpointFixture {
 
 	public String testReadCheckContain() {
 		String readJson = testReadRecord();
-		// JsonObject recordJsonObject = createJsonObjectFromResponseText(testReadRecord);
-		// JsonParser jsonParser = new OrgJsonParser();
-		// JsonValue jsonValue = jsonParser.parseString(responseText);
 		JsonObject jsonObject = jsonHandler.parseStringAsObject(readJson);
 
-		JsonToDataRecordConverter converter = JsonToDataRecordConverter
-				.forJsonObjectUsingConverterFactory(jsonObject, jsonToDataConverterFactory);
-		converter.toInstance();
+		DataRecord record = (DataRecord) jsonToDataConverter.toInstance(jsonObject);
 		return "OK";
 	}
 
@@ -430,5 +428,9 @@ public class RecordEndpointFixture {
 
 	public void setJsonHandler(JsonHandler jsonHandler) {
 		this.jsonHandler = jsonHandler;
+	}
+
+	public void setJsonToDataRecordConverter(JsonToDataRecordConverter jsonToDataConverter) {
+		this.jsonToDataConverter = jsonToDataConverter;
 	}
 }
