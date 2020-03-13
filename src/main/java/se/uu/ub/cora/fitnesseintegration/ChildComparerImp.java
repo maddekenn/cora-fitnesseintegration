@@ -36,22 +36,30 @@ public class ChildComparerImp implements ChildComparer {
 
 	private JsonArray extractChildren(JsonValue jsonValue) {
 		JsonObject jsonObject = (JsonObject) jsonValue;
-		JsonArray children = jsonObject.getValueAsJsonArray("children");
-		return children;
+		return jsonObject.getValueAsJsonArray("children");
 	}
 
 	@Override
 	public List<String> dataGroupContainsChildren(ClientDataGroup dataGroup, JsonValue jsonValue) {
 		List<String> errorMessages = new ArrayList<>();
 		for (JsonValue childValue : extractChildren(jsonValue)) {
-			JsonObject child = (JsonObject) childValue;
-			JsonString value = (JsonString) child.getValue("name");
+			JsonString value = getStringValue(childValue);
 			String nameInData = value.getStringValue();
-			if (!dataGroup.containsChildWithNameInData(nameInData)) {
-				errorMessages.add("child with nameInData " + nameInData + " is missing");
-			}
+			addErrorMessageIfChildIsMissing(dataGroup, nameInData, errorMessages);
 		}
 		return errorMessages;
+	}
+
+	private void addErrorMessageIfChildIsMissing(ClientDataGroup dataGroup, String nameInData,
+			List<String> errorMessages) {
+		if (!dataGroup.containsChildWithNameInData(nameInData)) {
+			errorMessages.add("child with nameInData " + nameInData + " is missing");
+		}
+	}
+
+	private JsonString getStringValue(JsonValue childValue) {
+		JsonObject child = (JsonObject) childValue;
+		return (JsonString) child.getValue("name");
 	}
 
 }

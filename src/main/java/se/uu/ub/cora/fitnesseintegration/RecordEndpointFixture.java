@@ -29,7 +29,6 @@ import java.nio.charset.StandardCharsets;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.StatusType;
 
-import se.uu.ub.cora.clientdata.ClientDataRecord;
 import se.uu.ub.cora.clientdata.DataRecord;
 import se.uu.ub.cora.clientdata.converter.jsontojava.JsonToDataConverterFactory;
 import se.uu.ub.cora.clientdata.converter.jsontojava.JsonToDataRecordConverter;
@@ -67,10 +66,12 @@ public class RecordEndpointFixture {
 	private JsonToDataConverterFactory jsonToDataConverterFactory;
 	private JsonHandler jsonHandler;
 	private JsonToDataRecordConverter jsonToDataConverter;
+	private ChildComparer childComparer;
 
 	public RecordEndpointFixture() {
 		httpHandlerFactory = DependencyProvider.getHttpHandlerFactory();
 		jsonToDataConverterFactory = DependencyProvider.getJsonToDataConverterFactory();
+		childComparer = DependencyProvider.getChildComparer();
 	}
 
 	public void setType(String type) {
@@ -392,17 +393,17 @@ public class RecordEndpointFixture {
 
 	public void testReadRecordAndStoreJson() {
 		String responseText = testReadRecord();
-		ClientDataRecord clientDataRecord = convertJsonToClientDataRecord(responseText);
+		DataRecord clientDataRecord = convertJsonToClientDataRecord(responseText);
 
 		RecordHolder.setRecord(clientDataRecord);
 	}
 
-	protected ClientDataRecord convertJsonToClientDataRecord(String responseText) {
+	protected DataRecord convertJsonToClientDataRecord(String responseText) {
 		JsonObject recordJsonObject = createJsonObjectFromResponseText(responseText);
 
 		JsonToDataRecordConverter converter = JsonToDataRecordConverterImp
 				.forJsonObjectUsingConverterFactory(jsonToDataConverterFactory);
-		return (ClientDataRecord) converter.toInstance(recordJsonObject);
+		return (DataRecord) converter.toInstance(recordJsonObject);
 	}
 
 	public HttpHandlerFactory getHttpHandlerFactory() {
@@ -418,6 +419,7 @@ public class RecordEndpointFixture {
 		JsonObject jsonObject = jsonHandler.parseStringAsObject(readJson);
 
 		DataRecord record = (DataRecord) jsonToDataConverter.toInstance(jsonObject);
+		childComparer.dataGroupContainsChildren(record.getClientDataGroup(), null);
 		return "OK";
 	}
 
@@ -432,5 +434,9 @@ public class RecordEndpointFixture {
 
 	public void setJsonToDataRecordConverter(JsonToDataRecordConverter jsonToDataConverter) {
 		this.jsonToDataConverter = jsonToDataConverter;
+	}
+
+	public ChildComparer getChildComparer() {
+		return childComparer;
 	}
 }

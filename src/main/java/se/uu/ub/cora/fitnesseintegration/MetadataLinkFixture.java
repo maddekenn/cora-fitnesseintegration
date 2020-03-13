@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import se.uu.ub.cora.clientdata.ClientDataGroup;
-import se.uu.ub.cora.clientdata.ClientDataRecord;
+import se.uu.ub.cora.clientdata.DataRecord;
 import se.uu.ub.cora.clientdata.RecordIdentifier;
 import se.uu.ub.cora.clientdata.converter.jsontojava.JsonToDataConverterFactory;
 import se.uu.ub.cora.clientdata.converter.jsontojava.JsonToDataRecordConverter;
@@ -82,14 +82,14 @@ public class MetadataLinkFixture {
 	}
 
 	private void possiblySetChildReferenceList() {
-		ClientDataRecord record = (ClientDataRecord) RecordHolder.getRecord();
+		DataRecord record = (DataRecord) RecordHolder.getRecord();
 		if (recordContainsDataGroup(record)) {
 			ClientDataGroup topLevelDataGroup = record.getClientDataGroup();
 			setChildReferenceList(topLevelDataGroup);
 		}
 	}
 
-	private boolean recordContainsDataGroup(ClientDataRecord record) {
+	private boolean recordContainsDataGroup(DataRecord record) {
 		return null != record && record.getClientDataGroup() != null;
 	}
 
@@ -192,12 +192,12 @@ public class MetadataLinkFixture {
 		JsonObject recordJsonObject = createJsonObjectFromResponseText(responseText);
 		recordConverter = JsonToDataRecordConverterImp
 				.forJsonObjectUsingConverterFactory(jsonToDataConverterFactory);
-		ClientDataRecord clientDataRecord = (ClientDataRecord) recordConverter
+		DataRecord clientDataRecord = (DataRecord) recordConverter
 				.toInstance(recordJsonObject);
 		return getNameInDataFromDataGroupInRecord(clientDataRecord);
 	}
 
-	private String getNameInDataFromDataGroupInRecord(ClientDataRecord clientDataRecord) {
+	private String getNameInDataFromDataGroupInRecord(DataRecord clientDataRecord) {
 		ClientDataGroup dataElement = clientDataRecord.getClientDataGroup();
 		return dataElement.getFirstAtomicValueWithNameInData("nameInData");
 	}

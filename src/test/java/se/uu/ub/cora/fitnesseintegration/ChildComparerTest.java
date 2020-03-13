@@ -86,7 +86,6 @@ public class ChildComparerTest {
 				"{\"children\":[{\"name\":\"workoutName\"},{\"name\":\"instructorId\"}]}");
 		List<String> errorMessages = childComparer.dataGroupContainsChildren(dataGroup, jsonValue);
 		assertTrue(errorMessages.isEmpty());
-
 	}
 
 	@Test

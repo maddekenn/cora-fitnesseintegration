@@ -19,7 +19,16 @@
 package se.uu.ub.cora.fitnesseintegration;
 
 import se.uu.ub.cora.clientdata.ClientData;
+import se.uu.ub.cora.clientdata.ClientDataGroup;
 import se.uu.ub.cora.clientdata.DataRecord;
 
 public class ClientDataRecordSpy implements DataRecord, ClientData {
+
+	private ClientDataGroup clientDataGroup;
+
+	@Override
+	public ClientDataGroup getClientDataGroup() {
+		clientDataGroup = ClientDataGroup.withNameInData("clientDataGroupSpy");
+		return clientDataGroup;
+	}
 }

@@ -3,7 +3,7 @@ package se.uu.ub.cora.fitnesseintegration;
 import java.util.List;
 
 import se.uu.ub.cora.clientdata.ClientDataGroup;
-import se.uu.ub.cora.clientdata.ClientDataRecord;
+import se.uu.ub.cora.clientdata.DataRecord;
 
 public class PresentationGroupFixture extends MetadataLinkFixture {
 
@@ -18,14 +18,14 @@ public class PresentationGroupFixture extends MetadataLinkFixture {
 	}
 
 	public int numberOfRefs() {
-		ClientDataRecord record = (ClientDataRecord) RecordHolder.getRecord();
+		DataRecord record = (DataRecord) RecordHolder.getRecord();
 		if (recordHasDataGroup(record)) {
 			return possiblyGetNumberOfMatchingChildren(record);
 		}
 		return 0;
 	}
 
-	private int possiblyGetNumberOfMatchingChildren(ClientDataRecord record) {
+	private int possiblyGetNumberOfMatchingChildren(DataRecord record) {
 		ClientDataGroup topLevelDataGroup = record.getClientDataGroup();
 		if (groupHasChildren(topLevelDataGroup)) {
 			return getNumberOfMatchingChildren(topLevelDataGroup);
@@ -54,7 +54,7 @@ public class PresentationGroupFixture extends MetadataLinkFixture {
 		return childReferenceMatchesTypeAndId(childLinkedRecordType, childLinkedRecordId);
 	}
 
-	private boolean recordHasDataGroup(ClientDataRecord record) {
+	private boolean recordHasDataGroup(DataRecord record) {
 		return record != null && record.getClientDataGroup() != null;
 	}
 

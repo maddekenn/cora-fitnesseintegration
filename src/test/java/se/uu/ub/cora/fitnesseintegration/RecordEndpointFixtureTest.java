@@ -33,6 +33,7 @@ import org.apache.http.client.ClientProtocolException;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import se.uu.ub.cora.clientdata.ClientDataGroup;
 import se.uu.ub.cora.clientdata.ClientDataRecord;
 
 public class RecordEndpointFixtureTest {
@@ -47,6 +48,8 @@ public class RecordEndpointFixtureTest {
 				"se.uu.ub.cora.fitnesseintegration.HttpHandlerFactorySpy");
 		DependencyProvider.setJsonToDataFactoryClassName(
 				"se.uu.ub.cora.fitnesseintegration.JsonToDataConverterFactorySpy");
+		DependencyProvider
+				.setChildComparerClassName("se.uu.ub.cora.fitnesseintegration.ChildComparerSpy");
 		httpHandlerFactorySpy = (HttpHandlerFactorySpy) DependencyProvider.getHttpHandlerFactory();
 		fixture = new RecordEndpointFixture();
 	}
@@ -56,6 +59,7 @@ public class RecordEndpointFixtureTest {
 		assertTrue(
 				fixture.getJsonToDataConverterFactory() instanceof JsonToDataConverterFactorySpy);
 		assertTrue(fixture.getHttpHandlerFactory() instanceof HttpHandlerFactorySpy);
+		assertTrue(fixture.getChildComparer() instanceof ChildComparer);
 
 	}
 
@@ -442,6 +446,12 @@ public class RecordEndpointFixtureTest {
 		assertEquals(jsonParser.jsonStringSentToParser, responseTextFromHttpSpy);
 
 		assertSame(jsonToDataConverter.jsonObject, jsonParser.jsonObjectSpy);
+
+		ClientDataGroup dataGroupFromRecordSpy = jsonToDataConverter.clientDataRecordSpy
+				.getClientDataGroup();
+		ChildComparerSpy childComparer = (ChildComparerSpy) fixture.getChildComparer();
+		assertSame(childComparer.dataGroup, dataGroupFromRecordSpy);
+
 		// JsonToDataConverterSpy factored = (JsonToDataConverterSpy) converterFactory.factored;
 		// assertEquasl()
 

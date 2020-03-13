@@ -28,6 +28,7 @@ import org.testng.annotations.Test;
 import se.uu.ub.cora.clientdata.ClientDataAtomic;
 import se.uu.ub.cora.clientdata.ClientDataGroup;
 import se.uu.ub.cora.clientdata.ClientDataRecord;
+import se.uu.ub.cora.clientdata.DataRecord;
 import se.uu.ub.cora.clientdata.converter.jsontojava.JsonToDataRecordConverter;
 import se.uu.ub.cora.json.parser.JsonObject;
 import se.uu.ub.cora.json.parser.JsonString;
@@ -53,7 +54,7 @@ public class MetadataLinkFixtureTest {
 
 		ClientDataGroup topLevelDataGroup = createTopLevelDataGroup();
 
-		ClientDataRecord record = ClientDataRecord.withClientDataGroup(topLevelDataGroup);
+		DataRecord record = ClientDataRecord.withClientDataGroup(topLevelDataGroup);
 		RecordHolder.setRecord(record);
 
 	}
@@ -122,7 +123,7 @@ public class MetadataLinkFixtureTest {
 	@Test
 	public void testNoMatchingChild() {
 		ClientDataGroup topLevelDataGroup = ClientDataGroup.withNameInData("metadata");
-		ClientDataRecord record = ClientDataRecord.withClientDataGroup(topLevelDataGroup);
+		DataRecord record = ClientDataRecord.withClientDataGroup(topLevelDataGroup);
 		RecordHolder.setRecord(record);
 		fixture.setLinkedRecordType("metadataGroup");
 		fixture.setLinkedRecordId("someRecordId");
@@ -132,7 +133,7 @@ public class MetadataLinkFixtureTest {
 
 	@Test
 	public void testNoTopLevelDatagroupInRecord() {
-		ClientDataRecord record = ClientDataRecord.withClientDataGroup(null);
+		DataRecord record = ClientDataRecord.withClientDataGroup(null);
 		RecordHolder.setRecord(record);
 		fixture.setLinkedRecordId("someRecordId");
 		fixture.setLinkedRecordType("metadataGroup");
@@ -140,7 +141,7 @@ public class MetadataLinkFixtureTest {
 	}
 
 	private void createAndAddSecondChild() {
-		ClientDataRecord record = (ClientDataRecord) RecordHolder.getRecord();
+		DataRecord record = (DataRecord) RecordHolder.getRecord();
 		ClientDataGroup clientDataGroup = record.getClientDataGroup();
 		ClientDataGroup childReferences = clientDataGroup
 				.getFirstGroupWithNameInData("childReferences");

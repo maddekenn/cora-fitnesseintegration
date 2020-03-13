@@ -70,4 +70,12 @@ public class DependencyProviderTest {
 	public void testFactorJsonToDataConverterFactoryClassNameNotSet() {
 		DependencyProvider.setJsonToDataFactoryClassName(null);
 	}
+
+	@Test
+	public void testFactorChildComparer() {
+		DependencyProvider
+				.setChildComparerClassName("se.uu.ub.cora.fitnesseintegration.ChildComparerImp");
+		ChildComparer factored = DependencyProvider.getChildComparer();
+		assertTrue(factored instanceof ChildComparerImp);
+	}
 }

@@ -18,20 +18,30 @@
  */
 package se.uu.ub.cora.fitnesseintegration;
 
-import se.uu.ub.cora.clientdata.ClientData;
-import se.uu.ub.cora.clientdata.converter.jsontojava.JsonToDataRecordConverter;
-import se.uu.ub.cora.json.parser.JsonObject;
+import java.util.ArrayList;
+import java.util.List;
 
-public class JsonToDataRecordConverterSpy implements JsonToDataRecordConverter {
+import se.uu.ub.cora.clientdata.ClientDataGroup;
+import se.uu.ub.cora.json.parser.JsonValue;
 
-	public JsonObject jsonObject;
-	public ClientDataRecordSpy clientDataRecordSpy;
+public class ChildComparerSpy implements ChildComparer {
+
+	public ClientDataGroup dataGroup;
+	public JsonValue jsonValue;
+	public List<String> listToReturn;
 
 	@Override
-	public ClientData toInstance(JsonObject jsonObject) {
-		this.jsonObject = jsonObject;
-		clientDataRecordSpy = new ClientDataRecordSpy();
-		return clientDataRecordSpy;
+	public boolean checkDataGroupContainsChildren(ClientDataGroup dataGroup, JsonValue jsonValue) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public List<String> dataGroupContainsChildren(ClientDataGroup dataGroup, JsonValue jsonValue) {
+		this.dataGroup = dataGroup;
+		this.jsonValue = jsonValue;
+		listToReturn = new ArrayList<>();
+		return listToReturn;
 	}
 
 }
