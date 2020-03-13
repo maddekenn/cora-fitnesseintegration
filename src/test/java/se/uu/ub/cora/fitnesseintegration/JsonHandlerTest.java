@@ -56,7 +56,7 @@ public class JsonHandlerTest {
 	public void testGetAsObject() {
 		String jsonString = "{\"example\":[{\"textVariable\":\"someTextId\"}]}";
 		JsonObject jsonObject = jsonHandler.parseStringAsObject(jsonString);
-		assertEquals(jsonString, jsonParser.jsonStringSentToParser);
+		assertEquals(jsonString, jsonParser.jsonStringsSentToParser.get(0));
 		assertSame(jsonParser.jsonObjectSpy, jsonObject);
 	}
 

@@ -18,6 +18,9 @@
  */
 package se.uu.ub.cora.fitnesseintegration;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import se.uu.ub.cora.json.parser.JsonArray;
 import se.uu.ub.cora.json.parser.JsonObject;
 import se.uu.ub.cora.json.parser.JsonParser;
@@ -28,7 +31,9 @@ public class JsonParserSpy implements JsonParser {
 	public String jsonStringSentToParser;
 	public JsonValueSpy jsonValueSpy;
 	public JsonObjectSpy jsonObjectSpy;
+	public List<JsonObjectSpy> jsonObjectSpies = new ArrayList<>();
 	public JsonArraySpy jsonArraySpy;
+	public List<String> jsonStringsSentToParser = new ArrayList<>();
 
 	@Override
 	public JsonValue parseString(String jsonString) {
@@ -39,8 +44,10 @@ public class JsonParserSpy implements JsonParser {
 
 	@Override
 	public JsonObject parseStringAsObject(String jsonString) {
-		jsonStringSentToParser = jsonString;
+		jsonStringsSentToParser.add(jsonString);
+		// jsonStringSentToParser = jsonString;
 		jsonObjectSpy = new JsonObjectSpy();
+		jsonObjectSpies.add(jsonObjectSpy);
 		return jsonObjectSpy;
 	}
 

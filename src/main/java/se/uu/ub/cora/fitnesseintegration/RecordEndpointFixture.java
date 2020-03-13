@@ -67,6 +67,7 @@ public class RecordEndpointFixture {
 	private JsonHandler jsonHandler;
 	private JsonToDataRecordConverter jsonToDataConverter;
 	private ChildComparer childComparer;
+	private String children;
 
 	public RecordEndpointFixture() {
 		httpHandlerFactory = DependencyProvider.getHttpHandlerFactory();
@@ -417,15 +418,15 @@ public class RecordEndpointFixture {
 	public String testReadCheckContain() {
 		String readJson = testReadRecord();
 		JsonObject jsonObject = jsonHandler.parseStringAsObject(readJson);
-
 		DataRecord record = (DataRecord) jsonToDataConverter.toInstance(jsonObject);
-		childComparer.dataGroupContainsChildren(record.getClientDataGroup(), null);
+
+		JsonObject childrenObject = jsonHandler.parseStringAsObject(children);
+		childComparer.dataGroupContainsChildren(record.getClientDataGroup(), childrenObject);
 		return "OK";
 	}
 
-	public String setChildren(String children) {
-		// TODO Auto-generated method stub
-		return null;
+	public void setChildren(String children) {
+		this.children = children;
 	}
 
 	public void setJsonHandler(JsonHandler jsonHandler) {

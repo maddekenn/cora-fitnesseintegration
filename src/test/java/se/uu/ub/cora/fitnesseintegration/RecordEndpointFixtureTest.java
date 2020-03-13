@@ -444,9 +444,9 @@ public class RecordEndpointFixtureTest {
 
 		String responseTextFromHttpSpy = httpHandlerFactorySpy.httpHandlerSpy.responseText;
 
-		assertEquals(jsonParser.jsonStringSentToParser, responseTextFromHttpSpy);
+		assertEquals(jsonParser.jsonStringsSentToParser.get(0), responseTextFromHttpSpy);
 
-		assertSame(jsonToDataConverter.jsonObject, jsonParser.jsonObjectSpy);
+		assertSame(jsonToDataConverter.jsonObject, jsonParser.jsonObjectSpies.get(0));
 
 		ClientDataRecordSpy clientDataRecordSpy = jsonToDataConverter.clientDataRecordSpy;
 		ClientDataGroup dataGroupFromRecordSpy = clientDataRecordSpy.clientDataGroup;
@@ -454,16 +454,16 @@ public class RecordEndpointFixtureTest {
 		ChildComparerSpy childComparer = (ChildComparerSpy) fixture.getChildComparer();
 		assertSame(childComparer.dataGroup, dataGroupFromRecordSpy);
 
-		// json från children ska skickas till jsonHandler, och resultatet ska skickas till
-
-		// assertSame(childComparer.jsonValue, dataGroupFromRecordSpy);
+		String parsedChildren = jsonParser.jsonStringsSentToParser.get(1);
+		assertEquals(parsedChildren, childrenToLookFor);
+		assertSame(childComparer.jsonValue, jsonParser.jsonObjectSpies.get(1));
 
 	}
 
-	@Test
-	public void testReadCheckContainOk() {
-		assertEquals(fixture.testReadCheckContain(), "OK");
-		// assertEquals(fixture.getStatusType(), Response.Status.OK);
-	}
+	// @Test
+	// public void testReadCheckContainOk() {
+	// assertEquals(fixture.testReadCheckContain(), "OK");
+	// // assertEquals(fixture.getStatusType(), Response.Status.OK);
+	// }
 
 }
