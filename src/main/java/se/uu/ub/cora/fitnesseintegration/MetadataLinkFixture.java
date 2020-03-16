@@ -22,10 +22,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import se.uu.ub.cora.clientdata.ClientDataGroup;
-import se.uu.ub.cora.clientdata.ClientDataRecord;
+import se.uu.ub.cora.clientdata.DataRecord;
 import se.uu.ub.cora.clientdata.RecordIdentifier;
 import se.uu.ub.cora.clientdata.converter.jsontojava.JsonToDataConverterFactory;
 import se.uu.ub.cora.clientdata.converter.jsontojava.JsonToDataRecordConverter;
+import se.uu.ub.cora.clientdata.converter.jsontojava.JsonToDataRecordConverterImp;
 import se.uu.ub.cora.httphandler.HttpHandler;
 import se.uu.ub.cora.httphandler.HttpHandlerFactory;
 import se.uu.ub.cora.json.parser.JsonObject;
@@ -81,14 +82,14 @@ public class MetadataLinkFixture {
 	}
 
 	private void possiblySetChildReferenceList() {
-		ClientDataRecord record = RecordHolder.getRecord();
+		DataRecord record = RecordHolder.getRecord();
 		if (recordContainsDataGroup(record)) {
 			ClientDataGroup topLevelDataGroup = record.getClientDataGroup();
 			setChildReferenceList(topLevelDataGroup);
 		}
 	}
 
-	private boolean recordContainsDataGroup(ClientDataRecord record) {
+	private boolean recordContainsDataGroup(DataRecord record) {
 		return null != record && record.getClientDataGroup() != null;
 	}
 
@@ -189,13 +190,13 @@ public class MetadataLinkFixture {
 
 	private String getNameInDataFromConvertedJson(String responseText) {
 		JsonObject recordJsonObject = createJsonObjectFromResponseText(responseText);
-		recordConverter = JsonToDataRecordConverter
-				.forJsonObjectUsingConverterFactory(recordJsonObject, jsonToDataConverterFactory);
-		ClientDataRecord clientDataRecord = recordConverter.toInstance();
+		recordConverter = JsonToDataRecordConverterImp
+				.usingConverterFactory(jsonToDataConverterFactory);
+		DataRecord clientDataRecord = (DataRecord) recordConverter.toInstance(recordJsonObject);
 		return getNameInDataFromDataGroupInRecord(clientDataRecord);
 	}
 
-	private String getNameInDataFromDataGroupInRecord(ClientDataRecord clientDataRecord) {
+	private String getNameInDataFromDataGroupInRecord(DataRecord clientDataRecord) {
 		ClientDataGroup dataElement = clientDataRecord.getClientDataGroup();
 		return dataElement.getFirstAtomicValueWithNameInData("nameInData");
 	}

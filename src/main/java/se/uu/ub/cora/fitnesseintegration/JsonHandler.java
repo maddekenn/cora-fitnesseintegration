@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Uppsala University Library
+ * Copyright 2020 Uppsala University Library
  *
  * This file is part of Cora.
  *
@@ -18,23 +18,19 @@
  */
 package se.uu.ub.cora.fitnesseintegration;
 
-import se.uu.ub.cora.clientdata.DataRecord;
+import se.uu.ub.cora.json.parser.JsonArray;
+import se.uu.ub.cora.json.parser.JsonObject;
+import se.uu.ub.cora.json.parser.JsonParser;
+import se.uu.ub.cora.json.parser.JsonValue;
 
-public class RecordHolder {
+public interface JsonHandler {
 
-	public RecordHolder() {
-		// needed by fitnesse
-		super();
-	}
+	JsonParser getJsonParser();
 
-	private static DataRecord clientDataRecord;
+	JsonValue parseStringAsValue(String jsonString);
 
-	public static void setRecord(DataRecord clientDataRecord) {
-		RecordHolder.clientDataRecord = clientDataRecord;
-	}
+	JsonObject parseStringAsObject(String jsonString);
 
-	public static DataRecord getRecord() {
-		return clientDataRecord;
-	}
+	JsonArray parseStringAsArray(String jsonString);
 
 }

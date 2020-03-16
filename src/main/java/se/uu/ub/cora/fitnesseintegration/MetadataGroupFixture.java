@@ -4,7 +4,7 @@ import java.util.List;
 
 import se.uu.ub.cora.clientdata.ClientDataElement;
 import se.uu.ub.cora.clientdata.ClientDataGroup;
-import se.uu.ub.cora.clientdata.ClientDataRecord;
+import se.uu.ub.cora.clientdata.DataRecord;
 
 public class MetadataGroupFixture {
 
@@ -17,14 +17,14 @@ public class MetadataGroupFixture {
 
 	public int numberOfChildrenWithNameInData() {
 		int numOfMatchingChildren = 0;
-		ClientDataRecord record = RecordHolder.getRecord();
+		DataRecord record = (DataRecord) RecordHolder.getRecord();
 		if (topLevelGroupExists(record)) {
 			numOfMatchingChildren = findNumOfMatchingChildren(record);
 		}
 		return numOfMatchingChildren;
 	}
 
-	private int findNumOfMatchingChildren(ClientDataRecord record) {
+	private int findNumOfMatchingChildren(DataRecord record) {
 		ClientDataGroup topLevelDataGroup = record.getClientDataGroup();
 		if (shouldFindChildrenInTopLevelDataGroup()) {
 			return getNumberOfMatchingChildren(topLevelDataGroup);
@@ -54,7 +54,7 @@ public class MetadataGroupFixture {
 		return getNumberOfMatchingChildren(childDataGroup);
 	}
 
-	private boolean topLevelGroupExists(ClientDataRecord record) {
+	private boolean topLevelGroupExists(DataRecord record) {
 		return record != null && record.getClientDataGroup() != null;
 	}
 

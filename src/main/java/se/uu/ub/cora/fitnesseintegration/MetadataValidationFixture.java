@@ -4,7 +4,7 @@ import javax.ws.rs.core.Response;
 
 import se.uu.ub.cora.clientdata.ClientDataAtomic;
 import se.uu.ub.cora.clientdata.ClientDataGroup;
-import se.uu.ub.cora.clientdata.ClientDataRecord;
+import se.uu.ub.cora.clientdata.DataRecord;
 import se.uu.ub.cora.clientdata.converter.javatojson.DataToJsonConverter;
 import se.uu.ub.cora.clientdata.converter.javatojson.DataToJsonConverterFactoryImp;
 import se.uu.ub.cora.httphandler.HttpHandler;
@@ -100,7 +100,7 @@ public class MetadataValidationFixture extends RecordEndpointFixture {
 	}
 
 	private void extractAndSetValidValue(String responseText) {
-		ClientDataRecord validationResultRecord = convertJsonToClientDataRecord(responseText);
+		DataRecord validationResultRecord = convertJsonToClientDataRecord(responseText);
 
 		ClientDataGroup dataGroup = validationResultRecord.getClientDataGroup();
 		valid = dataGroup.getFirstAtomicValueWithNameInData("valid");

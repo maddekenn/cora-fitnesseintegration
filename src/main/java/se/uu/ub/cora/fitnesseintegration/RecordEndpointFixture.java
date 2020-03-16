@@ -25,18 +25,22 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.StringJoiner;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.StatusType;
 
-import se.uu.ub.cora.clientdata.ClientDataRecord;
+import se.uu.ub.cora.clientdata.DataRecord;
 import se.uu.ub.cora.clientdata.converter.jsontojava.JsonToDataConverterFactory;
 import se.uu.ub.cora.clientdata.converter.jsontojava.JsonToDataRecordConverter;
+import se.uu.ub.cora.clientdata.converter.jsontojava.JsonToDataRecordConverterImp;
 import se.uu.ub.cora.httphandler.HttpHandler;
 import se.uu.ub.cora.httphandler.HttpHandlerFactory;
 import se.uu.ub.cora.httphandler.HttpMultiPartUploader;
 import se.uu.ub.cora.json.parser.JsonArray;
 import se.uu.ub.cora.json.parser.JsonObject;
+import se.uu.ub.cora.json.parser.JsonParseException;
 import se.uu.ub.cora.json.parser.JsonParser;
 import se.uu.ub.cora.json.parser.JsonValue;
 import se.uu.ub.cora.json.parser.org.OrgJsonParser;
@@ -63,10 +67,17 @@ public class RecordEndpointFixture {
 	private HttpHandlerFactory httpHandlerFactory;
 	private String token;
 	private JsonToDataConverterFactory jsonToDataConverterFactory;
+	private JsonHandler jsonHandler;
+	private JsonToDataRecordConverter jsonToDataRecordConverter;
+	private ChildComparer childComparer;
+	private String childrenToCompare;
 
 	public RecordEndpointFixture() {
 		httpHandlerFactory = DependencyProvider.getHttpHandlerFactory();
 		jsonToDataConverterFactory = DependencyProvider.getJsonToDataConverterFactory();
+		childComparer = DependencyProvider.getChildComparer();
+		jsonToDataRecordConverter = DependencyProvider.getJsonToDataRecordConverter();
+		jsonHandler = DependencyProvider.getJsonHandler();
 	}
 
 	public void setType(String type) {
@@ -388,17 +399,17 @@ public class RecordEndpointFixture {
 
 	public void testReadRecordAndStoreJson() {
 		String responseText = testReadRecord();
-		ClientDataRecord clientDataRecord = convertJsonToClientDataRecord(responseText);
+		DataRecord clientDataRecord = convertJsonToClientDataRecord(responseText);
 
 		RecordHolder.setRecord(clientDataRecord);
 	}
 
-	protected ClientDataRecord convertJsonToClientDataRecord(String responseText) {
+	protected DataRecord convertJsonToClientDataRecord(String responseText) {
 		JsonObject recordJsonObject = createJsonObjectFromResponseText(responseText);
 
-		JsonToDataRecordConverter converter = JsonToDataRecordConverter
-				.forJsonObjectUsingConverterFactory(recordJsonObject, jsonToDataConverterFactory);
-		return converter.toInstance();
+		JsonToDataRecordConverter converter = JsonToDataRecordConverterImp
+				.usingConverterFactory(jsonToDataConverterFactory);
+		return (DataRecord) converter.toInstance(recordJsonObject);
 	}
 
 	public HttpHandlerFactory getHttpHandlerFactory() {
@@ -407,5 +418,62 @@ public class RecordEndpointFixture {
 
 	public JsonToDataConverterFactory getJsonToDataConverterFactory() {
 		return jsonToDataConverterFactory;
+	}
+
+	public String testReadCheckContain() {
+		String readJson = testReadRecord();
+		JsonObject jsonObject = jsonHandler.parseStringAsObject(readJson);
+		DataRecord record = (DataRecord) jsonToDataRecordConverter.toInstance(jsonObject);
+
+		JsonObject childrenObject = jsonHandler.parseStringAsObject(childrenToCompare);
+		return tryToCompareChildren(record, childrenObject);
+
+	}
+
+	private String tryToCompareChildren(DataRecord record, JsonObject childrenObject) {
+		try {
+			List<String> errorMessages = childComparer
+					.checkDataGroupContainsChildren(record.getClientDataGroup(), childrenObject);
+			return errorMessages.isEmpty() ? "OK" : joinErrorMessages(errorMessages);
+		} catch (JsonParseException exception) {
+			return exception.getMessage();
+		}
+	}
+
+	private String joinErrorMessages(List<String> errorMessages) {
+		StringJoiner compareError = new StringJoiner(" ");
+		for (String errorMessage : errorMessages) {
+			compareError.add(errorMessage);
+		}
+		return compareError.toString();
+	}
+
+	public void setChildren(String children) {
+		this.childrenToCompare = children;
+	}
+
+	void setJsonToDataRecordConverter(JsonToDataRecordConverter jsonToDataConverter) {
+		// needed for test
+		this.jsonToDataRecordConverter = jsonToDataConverter;
+	}
+
+	public ChildComparer getChildComparer() {
+		// needed for test
+		return childComparer;
+	}
+
+	public JsonToDataRecordConverter getJsonToDataRecordConverter() {
+		// needed for test
+		return jsonToDataRecordConverter;
+	}
+
+	public JsonHandler getJsonHandler() {
+		// needed for test
+		return jsonHandler;
+	}
+
+	public void setJsonHandler(JsonHandler jsonHandler) {
+		// needed for test
+		this.jsonHandler = jsonHandler;
 	}
 }

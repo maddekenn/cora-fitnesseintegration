@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Uppsala University Library
+ * Copyright 2020 Uppsala University Library
  *
  * This file is part of Cora.
  *
@@ -18,23 +18,15 @@
  */
 package se.uu.ub.cora.fitnesseintegration;
 
-import se.uu.ub.cora.clientdata.DataRecord;
+import se.uu.ub.cora.json.parser.JsonValue;
+import se.uu.ub.cora.json.parser.JsonValueType;
 
-public class RecordHolder {
+public class JsonValueSpy implements JsonValue {
 
-	public RecordHolder() {
-		// needed by fitnesse
-		super();
-	}
-
-	private static DataRecord clientDataRecord;
-
-	public static void setRecord(DataRecord clientDataRecord) {
-		RecordHolder.clientDataRecord = clientDataRecord;
-	}
-
-	public static DataRecord getRecord() {
-		return clientDataRecord;
+	@Override
+	public JsonValueType getValueType() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

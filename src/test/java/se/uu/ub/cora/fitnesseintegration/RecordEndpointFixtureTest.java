@@ -20,6 +20,7 @@ package se.uu.ub.cora.fitnesseintegration;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotEquals;
+import static org.testng.Assert.assertSame;
 import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
@@ -32,11 +33,17 @@ import org.apache.http.client.ClientProtocolException;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import se.uu.ub.cora.clientdata.ClientDataGroup;
 import se.uu.ub.cora.clientdata.ClientDataRecord;
+import se.uu.ub.cora.clientdata.converter.jsontojava.JsonToDataRecordConverterImp;
 
 public class RecordEndpointFixtureTest {
 	private RecordEndpointFixture fixture;
 	private HttpHandlerFactorySpy httpHandlerFactorySpy;
+	private JsonHandler jsonHandler;
+	private JsonParserSpy jsonParser;
+	// private JsonToDataRecordConverterSpy jsonToDataConverter;
+	private JsonToDataRecordConverterSpy jsonToDataConverter;
 
 	@BeforeMethod
 	public void setUp() {
@@ -46,7 +53,12 @@ public class RecordEndpointFixtureTest {
 				"se.uu.ub.cora.fitnesseintegration.HttpHandlerFactorySpy");
 		DependencyProvider.setJsonToDataFactoryClassName(
 				"se.uu.ub.cora.fitnesseintegration.JsonToDataConverterFactorySpy");
+		DependencyProvider
+				.setChildComparerClassName("se.uu.ub.cora.fitnesseintegration.ChildComparerSpy");
 		httpHandlerFactorySpy = (HttpHandlerFactorySpy) DependencyProvider.getHttpHandlerFactory();
+		jsonParser = new JsonParserSpy();
+		jsonHandler = JsonHandlerImp.usingJsonParser(jsonParser);
+
 		fixture = new RecordEndpointFixture();
 	}
 
@@ -55,6 +67,10 @@ public class RecordEndpointFixtureTest {
 		assertTrue(
 				fixture.getJsonToDataConverterFactory() instanceof JsonToDataConverterFactorySpy);
 		assertTrue(fixture.getHttpHandlerFactory() instanceof HttpHandlerFactorySpy);
+		assertTrue(fixture.getChildComparer() instanceof ChildComparer);
+		assertTrue(fixture.getJsonToDataRecordConverter() instanceof JsonToDataRecordConverterImp);
+		assertTrue(fixture.getJsonToDataRecordConverter() instanceof JsonToDataRecordConverterImp);
+		assertTrue(fixture.getJsonHandler() instanceof JsonHandlerImp);
 
 	}
 
@@ -420,6 +436,89 @@ public class RecordEndpointFixtureTest {
 
 		assertNotEquals(RecordHolder.getRecord(), null);
 		assertTrue(RecordHolder.getRecord() instanceof ClientDataRecord);
+	}
+
+	@Test
+	public void testReadCheckContainSendsResultBetweenObjectsCorrectly() {
+		jsonToDataConverter = new JsonToDataRecordConverterSpy();
+		String childrenToLookFor = "{\"doesContain\":[{\"textVariable\":\"workoutName\"}]}";
+		setUpFixtureForReadCheckContain(childrenToLookFor);
+		fixture.testReadCheckContain();
+
+		assertHttpResponseIsParsedAndResultSentToConverter();
+
+		ChildComparerSpy childComparer = (ChildComparerSpy) fixture.getChildComparer();
+
+		assertDataGroupFromReadRecordIsUsedInChildComparer(childComparer);
+
+		assertChildrenStringIsParsedAndResultSentToComparer(childrenToLookFor, childComparer);
+
+	}
+
+	private void setUpFixtureForReadCheckContain(String childrenToLookFor) {
+		fixture.setJsonHandler(jsonHandler);
+
+		fixture.setJsonToDataRecordConverter(jsonToDataConverter);
+
+		fixture.setType("someCheckChildrenOkType");
+		fixture.setId("someId");
+		fixture.setChildren(childrenToLookFor);
+	}
+
+	private void assertHttpResponseIsParsedAndResultSentToConverter() {
+		String responseTextFromHttpSpy = httpHandlerFactorySpy.httpHandlerSpy.responseText;
+		assertEquals(jsonParser.jsonStringsSentToParser.get(0), responseTextFromHttpSpy);
+
+		assertSame(jsonToDataConverter.jsonObject, jsonParser.jsonObjectSpies.get(0));
+	}
+
+	private void assertDataGroupFromReadRecordIsUsedInChildComparer(
+			ChildComparerSpy childComparer) {
+		ClientDataRecordSpy clientDataRecordSpy = jsonToDataConverter.clientDataRecordSpy;
+		ClientDataGroup dataGroupFromRecordSpy = clientDataRecordSpy.clientDataGroup;
+		assertSame(childComparer.dataGroup, dataGroupFromRecordSpy);
+	}
+
+	private void assertChildrenStringIsParsedAndResultSentToComparer(String childrenToLookFor,
+			ChildComparerSpy childComparer) {
+		String parsedChildren = jsonParser.jsonStringsSentToParser.get(1);
+		assertEquals(parsedChildren, childrenToLookFor);
+		assertSame(childComparer.jsonValue, jsonParser.jsonObjectSpies.get(1));
+	}
+
+	@Test
+	public void testReadCheckContainResultOK() {
+		jsonToDataConverter = new JsonToDataRecordConverterSpy();
+		String childrenToLookFor = "{\"doesContain\":[{\"textVariable\":\"workoutName\"}]}";
+		setUpFixtureForReadCheckContain(childrenToLookFor);
+
+		assertEquals(fixture.testReadCheckContain(), "OK");
+	}
+
+	@Test
+	public void testReadCheckContainResultNotOK() {
+		jsonToDataConverter = new JsonToDataRecordConverterSpy();
+		String childrenToLookFor = "{\"doesContain\":[{\"textVariable\":\"workoutName\"}]}";
+		setUpFixtureForReadCheckContain(childrenToLookFor);
+
+		ChildComparerSpy childComparer = (ChildComparerSpy) fixture.getChildComparer();
+		childComparer.numberToReturn = 3;
+
+		assertEquals(fixture.testReadCheckContain(),
+				"From spy: Child with number 0 is missing. "
+						+ "From spy: Child with number 1 is missing. "
+						+ "From spy: Child with number 2 is missing.");
+	}
+
+	@Test
+	public void testReadCheckContainComparerThrowsError() {
+		jsonToDataConverter = new JsonToDataRecordConverterSpy();
+		String childrenToLookFor = "{\"doesContain\":[{\"textVariable\":\"workoutName\"}]}";
+		setUpFixtureForReadCheckContain(childrenToLookFor);
+		ChildComparerSpy childComparer = (ChildComparerSpy) fixture.getChildComparer();
+		childComparer.spyShouldThrowError = true;
+
+		assertEquals(fixture.testReadCheckContain(), childComparer.errorMessage);
 	}
 
 }

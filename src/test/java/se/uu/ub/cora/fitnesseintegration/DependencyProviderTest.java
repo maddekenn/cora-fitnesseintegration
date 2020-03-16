@@ -19,14 +19,17 @@
 
 package se.uu.ub.cora.fitnesseintegration;
 
+import static org.testng.Assert.assertSame;
 import static org.testng.Assert.assertTrue;
 
 import org.testng.annotations.Test;
 
 import se.uu.ub.cora.clientdata.converter.jsontojava.JsonToDataConverterFactory;
 import se.uu.ub.cora.clientdata.converter.jsontojava.JsonToDataConverterFactoryImp;
+import se.uu.ub.cora.clientdata.converter.jsontojava.JsonToDataRecordConverterImp;
 import se.uu.ub.cora.httphandler.HttpHandlerFactory;
 import se.uu.ub.cora.httphandler.HttpHandlerFactoryImp;
+import se.uu.ub.cora.json.parser.org.OrgJsonParser;
 
 public class DependencyProviderTest {
 	@Test
@@ -69,5 +72,32 @@ public class DependencyProviderTest {
 	@Test(expectedExceptions = RuntimeException.class)
 	public void testFactorJsonToDataConverterFactoryClassNameNotSet() {
 		DependencyProvider.setJsonToDataFactoryClassName(null);
+	}
+
+	@Test
+	public void testChildComparer() {
+		DependencyProvider
+				.setChildComparerClassName("se.uu.ub.cora.fitnesseintegration.ChildComparerImp");
+		ChildComparer childComparer = DependencyProvider.getChildComparer();
+		assertTrue(childComparer instanceof ChildComparerImp);
+	}
+
+	@Test(expectedExceptions = RuntimeException.class)
+	public void testChildComparerNonExistingClassName() {
+		DependencyProvider.setChildComparerClassName("se.uu.ub.cora.fitnesse.DoesNotExistImp");
+	}
+
+	@Test
+	public void testGetJsonToDataRecordConverter() {
+		JsonToDataRecordConverterImp jsonToDataRecordConverter = (JsonToDataRecordConverterImp) DependencyProvider
+				.getJsonToDataRecordConverter();
+		assertSame(jsonToDataRecordConverter.getConverterFactory(),
+				DependencyProvider.getJsonToDataConverterFactory());
+	}
+
+	@Test
+	public void testGetJsonHandler() {
+		JsonHandlerImp jsonHandler = (JsonHandlerImp) DependencyProvider.getJsonHandler();
+		assertTrue(jsonHandler.getJsonParser() instanceof OrgJsonParser);
 	}
 }
