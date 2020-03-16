@@ -17,7 +17,7 @@ public class MetadataGroupFixture {
 
 	public int numberOfChildrenWithNameInData() {
 		int numOfMatchingChildren = 0;
-		DataRecord record = (DataRecord) RecordHolder.getRecord();
+		DataRecord record = RecordHolder.getRecord();
 		if (topLevelGroupExists(record)) {
 			numOfMatchingChildren = findNumOfMatchingChildren(record);
 		}
