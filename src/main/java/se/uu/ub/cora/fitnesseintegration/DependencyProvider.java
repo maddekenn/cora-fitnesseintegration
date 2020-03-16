@@ -25,6 +25,7 @@ import se.uu.ub.cora.clientdata.converter.jsontojava.JsonToDataConverterFactory;
 import se.uu.ub.cora.clientdata.converter.jsontojava.JsonToDataRecordConverter;
 import se.uu.ub.cora.clientdata.converter.jsontojava.JsonToDataRecordConverterImp;
 import se.uu.ub.cora.httphandler.HttpHandlerFactory;
+import se.uu.ub.cora.json.parser.org.OrgJsonParser;
 
 public final class DependencyProvider {
 
@@ -85,5 +86,10 @@ public final class DependencyProvider {
 
 	public static JsonToDataRecordConverter getJsonToDataRecordConverter() {
 		return new JsonToDataRecordConverterImp(getJsonToDataConverterFactory());
+	}
+
+	public static JsonHandler getJsonHandler() {
+		OrgJsonParser jsonParser = new OrgJsonParser();
+		return JsonHandlerImp.usingJsonParser(jsonParser);
 	}
 }

@@ -35,6 +35,7 @@ import org.testng.annotations.Test;
 
 import se.uu.ub.cora.clientdata.ClientDataGroup;
 import se.uu.ub.cora.clientdata.ClientDataRecord;
+import se.uu.ub.cora.clientdata.converter.jsontojava.JsonToDataRecordConverterImp;
 
 public class RecordEndpointFixtureTest {
 	private RecordEndpointFixture fixture;
@@ -67,6 +68,9 @@ public class RecordEndpointFixtureTest {
 				fixture.getJsonToDataConverterFactory() instanceof JsonToDataConverterFactorySpy);
 		assertTrue(fixture.getHttpHandlerFactory() instanceof HttpHandlerFactorySpy);
 		assertTrue(fixture.getChildComparer() instanceof ChildComparer);
+		assertTrue(fixture.getJsonToDataRecordConverter() instanceof JsonToDataRecordConverterImp);
+		assertTrue(fixture.getJsonToDataRecordConverter() instanceof JsonToDataRecordConverterImp);
+		assertTrue(fixture.getJsonHandler() instanceof JsonHandlerImp);
 
 	}
 

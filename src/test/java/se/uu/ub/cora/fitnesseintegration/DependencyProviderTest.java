@@ -29,6 +29,7 @@ import se.uu.ub.cora.clientdata.converter.jsontojava.JsonToDataConverterFactoryI
 import se.uu.ub.cora.clientdata.converter.jsontojava.JsonToDataRecordConverterImp;
 import se.uu.ub.cora.httphandler.HttpHandlerFactory;
 import se.uu.ub.cora.httphandler.HttpHandlerFactoryImp;
+import se.uu.ub.cora.json.parser.org.OrgJsonParser;
 
 public class DependencyProviderTest {
 	@Test
@@ -74,20 +75,24 @@ public class DependencyProviderTest {
 	}
 
 	@Test
-	public void testFactorChildComparer() {
+	public void testChildComparer() {
 		DependencyProvider
 				.setChildComparerClassName("se.uu.ub.cora.fitnesseintegration.ChildComparerImp");
-		ChildComparer factored = DependencyProvider.getChildComparer();
-		assertTrue(factored instanceof ChildComparerImp);
+		ChildComparer childComparer = DependencyProvider.getChildComparer();
+		assertTrue(childComparer instanceof ChildComparerImp);
 	}
 
 	@Test
 	public void testGetJsonToDataRecordConverter() {
-		DependencyProvider.setJsonToDataFactoryClassName(
-				"se.uu.ub.cora.clientdata.converter.jsontojava.JsonToDataConverterFactoryImp");
 		JsonToDataRecordConverterImp jsonToDataRecordConverter = (JsonToDataRecordConverterImp) DependencyProvider
 				.getJsonToDataRecordConverter();
 		assertSame(jsonToDataRecordConverter.getConverterFactory(),
 				DependencyProvider.getJsonToDataConverterFactory());
+	}
+
+	@Test
+	public void testGetJsonHandler() {
+		JsonHandlerImp jsonHandler = (JsonHandlerImp) DependencyProvider.getJsonHandler();
+		assertTrue(jsonHandler.getJsonParser() instanceof OrgJsonParser);
 	}
 }

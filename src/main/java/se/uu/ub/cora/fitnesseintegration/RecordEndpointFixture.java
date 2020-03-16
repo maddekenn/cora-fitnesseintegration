@@ -75,7 +75,8 @@ public class RecordEndpointFixture {
 		httpHandlerFactory = DependencyProvider.getHttpHandlerFactory();
 		jsonToDataConverterFactory = DependencyProvider.getJsonToDataConverterFactory();
 		childComparer = DependencyProvider.getChildComparer();
-		// jsonToDataConverter = DependencyProvider.getJsonToDataRecordConverter();
+		jsonToDataRecordConverter = DependencyProvider.getJsonToDataRecordConverter();
+		jsonHandler = DependencyProvider.getJsonHandler();
 	}
 
 	public void setType(String type) {
@@ -442,6 +443,7 @@ public class RecordEndpointFixture {
 	}
 
 	public void setJsonHandler(JsonHandler jsonHandler) {
+		// needed for test
 		this.jsonHandler = jsonHandler;
 	}
 
@@ -452,5 +454,15 @@ public class RecordEndpointFixture {
 
 	public ChildComparer getChildComparer() {
 		return childComparer;
+	}
+
+	public JsonToDataRecordConverter getJsonToDataRecordConverter() {
+		// needed for test
+		return jsonToDataRecordConverter;
+	}
+
+	public JsonHandler getJsonHandler() {
+		// needed for test
+		return jsonHandler;
 	}
 }
