@@ -82,7 +82,7 @@ public class MetadataLinkFixture {
 	}
 
 	private void possiblySetChildReferenceList() {
-		DataRecord record = (DataRecord) RecordHolder.getRecord();
+		DataRecord record = RecordHolder.getRecord();
 		if (recordContainsDataGroup(record)) {
 			ClientDataGroup topLevelDataGroup = record.getClientDataGroup();
 			setChildReferenceList(topLevelDataGroup);
@@ -191,9 +191,8 @@ public class MetadataLinkFixture {
 	private String getNameInDataFromConvertedJson(String responseText) {
 		JsonObject recordJsonObject = createJsonObjectFromResponseText(responseText);
 		recordConverter = JsonToDataRecordConverterImp
-				.forJsonObjectUsingConverterFactory(jsonToDataConverterFactory);
-		DataRecord clientDataRecord = (DataRecord) recordConverter
-				.toInstance(recordJsonObject);
+				.usingConverterFactory(jsonToDataConverterFactory);
+		DataRecord clientDataRecord = (DataRecord) recordConverter.toInstance(recordJsonObject);
 		return getNameInDataFromDataGroupInRecord(clientDataRecord);
 	}
 

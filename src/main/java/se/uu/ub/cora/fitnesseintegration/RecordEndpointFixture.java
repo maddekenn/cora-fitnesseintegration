@@ -408,7 +408,7 @@ public class RecordEndpointFixture {
 		JsonObject recordJsonObject = createJsonObjectFromResponseText(responseText);
 
 		JsonToDataRecordConverter converter = JsonToDataRecordConverterImp
-				.forJsonObjectUsingConverterFactory(jsonToDataConverterFactory);
+				.usingConverterFactory(jsonToDataConverterFactory);
 		return (DataRecord) converter.toInstance(recordJsonObject);
 	}
 
