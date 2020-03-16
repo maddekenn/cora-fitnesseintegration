@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import se.uu.ub.cora.clientdata.ClientDataGroup;
+import se.uu.ub.cora.json.parser.JsonParseException;
 import se.uu.ub.cora.json.parser.JsonValue;
 
 public class ChildComparerSpy implements ChildComparer {
@@ -30,17 +31,24 @@ public class ChildComparerSpy implements ChildComparer {
 	public JsonValue jsonValue;
 	public int numberToReturn = 0;
 	public List<String> listToReturn;
+	public boolean spyShouldThrowError = false;
+	public String errorMessage;
 
 	@Override
-	public boolean checkDataGroupContainsChildren(ClientDataGroup dataGroup, JsonValue jsonValue) {
+	public boolean dataGroupContainsChildren(ClientDataGroup dataGroup, JsonValue jsonValue) {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
-	public List<String> dataGroupContainsChildren(ClientDataGroup dataGroup, JsonValue jsonValue) {
+	public List<String> checkDataGroupContainsChildren(ClientDataGroup dataGroup,
+			JsonValue jsonValue) {
 		this.dataGroup = dataGroup;
 		this.jsonValue = jsonValue;
+		if (spyShouldThrowError) {
+			errorMessage = "error from spy";
+			throw new JsonParseException(errorMessage);
+		}
 		listToReturn = new ArrayList<>();
 		for (int i = 0; i < numberToReturn; i++) {
 			String errorMessage = "From spy: Child with number " + i + " is missing.";

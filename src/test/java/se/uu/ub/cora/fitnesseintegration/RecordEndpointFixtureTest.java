@@ -510,10 +510,15 @@ public class RecordEndpointFixtureTest {
 						+ "From spy: Child with number 2 is missing.");
 	}
 
-	// @Test
-	// public void testReadCheckContainOk() {
-	// assertEquals(fixture.testReadCheckContain(), "OK");
-	// // assertEquals(fixture.getStatusType(), Response.Status.OK);
-	// }
+	@Test
+	public void testReadCheckContainComparerThrowsError() {
+		jsonToDataConverter = new JsonToDataRecordConverterSpy();
+		String childrenToLookFor = "{\"doesContain\":[{\"textVariable\":\"workoutName\"}]}";
+		setUpFixtureForReadCheckContain(childrenToLookFor);
+		ChildComparerSpy childComparer = (ChildComparerSpy) fixture.getChildComparer();
+		childComparer.spyShouldThrowError = true;
+
+		assertEquals(fixture.testReadCheckContain(), childComparer.errorMessage);
+	}
 
 }

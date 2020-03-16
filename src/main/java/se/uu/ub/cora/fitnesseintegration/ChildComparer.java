@@ -25,8 +25,8 @@ import se.uu.ub.cora.json.parser.JsonValue;
 
 public interface ChildComparer {
 
-	boolean checkDataGroupContainsChildren(ClientDataGroup dataGroup, JsonValue jsonValue);
+	boolean dataGroupContainsChildren(ClientDataGroup dataGroup, JsonValue jsonValue);
 
-	List<String> dataGroupContainsChildren(ClientDataGroup dataGroup, JsonValue jsonValue);
+	List<String> checkDataGroupContainsChildren(ClientDataGroup dataGroup, JsonValue jsonValue);
 
 }

@@ -82,6 +82,11 @@ public class DependencyProviderTest {
 		assertTrue(childComparer instanceof ChildComparerImp);
 	}
 
+	@Test(expectedExceptions = RuntimeException.class)
+	public void testChildComparerNonExistingClassName() {
+		DependencyProvider.setChildComparerClassName("se.uu.ub.cora.fitnesse.DoesNotExistImp");
+	}
+
 	@Test
 	public void testGetJsonToDataRecordConverter() {
 		JsonToDataRecordConverterImp jsonToDataRecordConverter = (JsonToDataRecordConverterImp) DependencyProvider

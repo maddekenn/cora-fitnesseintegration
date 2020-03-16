@@ -40,6 +40,7 @@ import se.uu.ub.cora.httphandler.HttpHandlerFactory;
 import se.uu.ub.cora.httphandler.HttpMultiPartUploader;
 import se.uu.ub.cora.json.parser.JsonArray;
 import se.uu.ub.cora.json.parser.JsonObject;
+import se.uu.ub.cora.json.parser.JsonParseException;
 import se.uu.ub.cora.json.parser.JsonParser;
 import se.uu.ub.cora.json.parser.JsonValue;
 import se.uu.ub.cora.json.parser.org.OrgJsonParser;
@@ -69,7 +70,7 @@ public class RecordEndpointFixture {
 	private JsonHandler jsonHandler;
 	private JsonToDataRecordConverter jsonToDataRecordConverter;
 	private ChildComparer childComparer;
-	private String children;
+	private String childrenToCompare;
 
 	public RecordEndpointFixture() {
 		httpHandlerFactory = DependencyProvider.getHttpHandlerFactory();
@@ -424,27 +425,31 @@ public class RecordEndpointFixture {
 		JsonObject jsonObject = jsonHandler.parseStringAsObject(readJson);
 		DataRecord record = (DataRecord) jsonToDataRecordConverter.toInstance(jsonObject);
 
-		JsonObject childrenObject = jsonHandler.parseStringAsObject(children);
-		List<String> errorMessages = childComparer
-				.dataGroupContainsChildren(record.getClientDataGroup(), childrenObject);
-		if (errorMessages.isEmpty()) {
-			return "OK";
+		JsonObject childrenObject = jsonHandler.parseStringAsObject(childrenToCompare);
+		return tryToCompareChildren(record, childrenObject);
+
+	}
+
+	private String tryToCompareChildren(DataRecord record, JsonObject childrenObject) {
+		try {
+			List<String> errorMessages = childComparer
+					.checkDataGroupContainsChildren(record.getClientDataGroup(), childrenObject);
+			return errorMessages.isEmpty() ? "OK" : joinErrorMessages(errorMessages);
+		} catch (JsonParseException exception) {
+			return exception.getMessage();
 		}
+	}
+
+	private String joinErrorMessages(List<String> errorMessages) {
 		StringJoiner compareError = new StringJoiner(" ");
 		for (String errorMessage : errorMessages) {
 			compareError.add(errorMessage);
 		}
 		return compareError.toString();
-
 	}
 
 	public void setChildren(String children) {
-		this.children = children;
-	}
-
-	public void setJsonHandler(JsonHandler jsonHandler) {
-		// needed for test
-		this.jsonHandler = jsonHandler;
+		this.childrenToCompare = children;
 	}
 
 	void setJsonToDataRecordConverter(JsonToDataRecordConverter jsonToDataConverter) {
@@ -453,6 +458,7 @@ public class RecordEndpointFixture {
 	}
 
 	public ChildComparer getChildComparer() {
+		// needed for test
 		return childComparer;
 	}
 
@@ -464,5 +470,10 @@ public class RecordEndpointFixture {
 	public JsonHandler getJsonHandler() {
 		// needed for test
 		return jsonHandler;
+	}
+
+	public void setJsonHandler(JsonHandler jsonHandler) {
+		// needed for test
+		this.jsonHandler = jsonHandler;
 	}
 }
