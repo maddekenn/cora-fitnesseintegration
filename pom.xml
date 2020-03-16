@@ -27,7 +27,7 @@
 
 	<artifactId>fitnesseintegration</artifactId>
 	<packaging>jar</packaging>
-	<version>2.2-SNAPSHOT</version>
+	<version>2.2.0</version>
 	<name>Fitnesse integration</name>
 
 	<properties>
