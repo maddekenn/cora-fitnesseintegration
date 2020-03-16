@@ -94,7 +94,7 @@ public class ChildComparerTest {
 		JsonValue jsonValue = jsonParser.parseString("{\"children\":[{\"name\":\"workoutName\"}]}");
 		List<String> errorMessages = childComparer.dataGroupContainsChildren(dataGroup, jsonValue);
 		assertEquals(errorMessages.size(), 1);
-		assertEquals(errorMessages.get(0), "child with nameInData workoutName is missing");
+		assertEquals(errorMessages.get(0), "Child with nameInData workoutName is missing.");
 
 		boolean containsChildren = childComparer.checkDataGroupContainsChildren(dataGroup,
 				jsonValue);
@@ -107,7 +107,7 @@ public class ChildComparerTest {
 		JsonValue jsonValue = jsonParser.parseString("{\"children\":[{\"name\":\"workoutName\"}]}");
 		List<String> errorMessages = childComparer.dataGroupContainsChildren(dataGroup, jsonValue);
 		assertEquals(errorMessages.size(), 1);
-		assertEquals(errorMessages.get(0), "child with nameInData workoutName is missing");
+		assertEquals(errorMessages.get(0), "Child with nameInData workoutName is missing.");
 
 	}
 
@@ -127,7 +127,7 @@ public class ChildComparerTest {
 				"{\"children\":[{\"name\":\"workoutName\"},{\"name\":\"instructorId\"}]}");
 		List<String> errorMessages = childComparer.dataGroupContainsChildren(dataGroup, jsonValue);
 		assertEquals(errorMessages.size(), 1);
-		assertEquals(errorMessages.get(0), "child with nameInData instructorId is missing");
+		assertEquals(errorMessages.get(0), "Child with nameInData instructorId is missing.");
 
 	}
 

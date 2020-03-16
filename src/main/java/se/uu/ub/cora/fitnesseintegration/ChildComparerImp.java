@@ -53,7 +53,7 @@ public class ChildComparerImp implements ChildComparer {
 	private void addErrorMessageIfChildIsMissing(ClientDataGroup dataGroup, String nameInData,
 			List<String> errorMessages) {
 		if (!dataGroup.containsChildWithNameInData(nameInData)) {
-			errorMessages.add("child with nameInData " + nameInData + " is missing");
+			errorMessages.add("Child with nameInData " + nameInData + " is missing.");
 		}
 	}
 

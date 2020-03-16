@@ -22,6 +22,8 @@ package se.uu.ub.cora.fitnesseintegration;
 import java.lang.reflect.Constructor;
 
 import se.uu.ub.cora.clientdata.converter.jsontojava.JsonToDataConverterFactory;
+import se.uu.ub.cora.clientdata.converter.jsontojava.JsonToDataRecordConverter;
+import se.uu.ub.cora.clientdata.converter.jsontojava.JsonToDataRecordConverterImp;
 import se.uu.ub.cora.httphandler.HttpHandlerFactory;
 
 public final class DependencyProvider {
@@ -79,5 +81,9 @@ public final class DependencyProvider {
 
 	public static ChildComparer getChildComparer() {
 		return childComparer;
+	}
+
+	public static JsonToDataRecordConverter getJsonToDataRecordConverter() {
+		return new JsonToDataRecordConverterImp(getJsonToDataConverterFactory());
 	}
 }

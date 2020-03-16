@@ -19,12 +19,14 @@
 
 package se.uu.ub.cora.fitnesseintegration;
 
+import static org.testng.Assert.assertSame;
 import static org.testng.Assert.assertTrue;
 
 import org.testng.annotations.Test;
 
 import se.uu.ub.cora.clientdata.converter.jsontojava.JsonToDataConverterFactory;
 import se.uu.ub.cora.clientdata.converter.jsontojava.JsonToDataConverterFactoryImp;
+import se.uu.ub.cora.clientdata.converter.jsontojava.JsonToDataRecordConverterImp;
 import se.uu.ub.cora.httphandler.HttpHandlerFactory;
 import se.uu.ub.cora.httphandler.HttpHandlerFactoryImp;
 
@@ -77,5 +79,15 @@ public class DependencyProviderTest {
 				.setChildComparerClassName("se.uu.ub.cora.fitnesseintegration.ChildComparerImp");
 		ChildComparer factored = DependencyProvider.getChildComparer();
 		assertTrue(factored instanceof ChildComparerImp);
+	}
+
+	@Test
+	public void testGetJsonToDataRecordConverter() {
+		DependencyProvider.setJsonToDataFactoryClassName(
+				"se.uu.ub.cora.clientdata.converter.jsontojava.JsonToDataConverterFactoryImp");
+		JsonToDataRecordConverterImp jsonToDataRecordConverter = (JsonToDataRecordConverterImp) DependencyProvider
+				.getJsonToDataRecordConverter();
+		assertSame(jsonToDataRecordConverter.getConverterFactory(),
+				DependencyProvider.getJsonToDataConverterFactory());
 	}
 }

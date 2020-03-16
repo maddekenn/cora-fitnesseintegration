@@ -28,6 +28,7 @@ public class ChildComparerSpy implements ChildComparer {
 
 	public ClientDataGroup dataGroup;
 	public JsonValue jsonValue;
+	public int numberToReturn = 0;
 	public List<String> listToReturn;
 
 	@Override
@@ -41,6 +42,10 @@ public class ChildComparerSpy implements ChildComparer {
 		this.dataGroup = dataGroup;
 		this.jsonValue = jsonValue;
 		listToReturn = new ArrayList<>();
+		for (int i = 0; i < numberToReturn; i++) {
+			String errorMessage = "From spy: Child with number " + i + " is missing.";
+			listToReturn.add(errorMessage);
+		}
 		return listToReturn;
 	}
 

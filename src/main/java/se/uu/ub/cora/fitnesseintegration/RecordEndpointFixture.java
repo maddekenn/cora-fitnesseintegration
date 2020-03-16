@@ -25,6 +25,8 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.StringJoiner;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.StatusType;
@@ -65,7 +67,7 @@ public class RecordEndpointFixture {
 	private String token;
 	private JsonToDataConverterFactory jsonToDataConverterFactory;
 	private JsonHandler jsonHandler;
-	private JsonToDataRecordConverter jsonToDataConverter;
+	private JsonToDataRecordConverter jsonToDataRecordConverter;
 	private ChildComparer childComparer;
 	private String children;
 
@@ -73,6 +75,7 @@ public class RecordEndpointFixture {
 		httpHandlerFactory = DependencyProvider.getHttpHandlerFactory();
 		jsonToDataConverterFactory = DependencyProvider.getJsonToDataConverterFactory();
 		childComparer = DependencyProvider.getChildComparer();
+		// jsonToDataConverter = DependencyProvider.getJsonToDataRecordConverter();
 	}
 
 	public void setType(String type) {
@@ -418,11 +421,20 @@ public class RecordEndpointFixture {
 	public String testReadCheckContain() {
 		String readJson = testReadRecord();
 		JsonObject jsonObject = jsonHandler.parseStringAsObject(readJson);
-		DataRecord record = (DataRecord) jsonToDataConverter.toInstance(jsonObject);
+		DataRecord record = (DataRecord) jsonToDataRecordConverter.toInstance(jsonObject);
 
 		JsonObject childrenObject = jsonHandler.parseStringAsObject(children);
-		childComparer.dataGroupContainsChildren(record.getClientDataGroup(), childrenObject);
-		return "OK";
+		List<String> errorMessages = childComparer
+				.dataGroupContainsChildren(record.getClientDataGroup(), childrenObject);
+		if (errorMessages.isEmpty()) {
+			return "OK";
+		}
+		StringJoiner compareError = new StringJoiner(" ");
+		for (String errorMessage : errorMessages) {
+			compareError.add(errorMessage);
+		}
+		return compareError.toString();
+
 	}
 
 	public void setChildren(String children) {
@@ -433,8 +445,9 @@ public class RecordEndpointFixture {
 		this.jsonHandler = jsonHandler;
 	}
 
-	public void setJsonToDataRecordConverter(JsonToDataRecordConverter jsonToDataConverter) {
-		this.jsonToDataConverter = jsonToDataConverter;
+	void setJsonToDataRecordConverter(JsonToDataRecordConverter jsonToDataConverter) {
+		// needed for test
+		this.jsonToDataRecordConverter = jsonToDataConverter;
 	}
 
 	public ChildComparer getChildComparer() {
