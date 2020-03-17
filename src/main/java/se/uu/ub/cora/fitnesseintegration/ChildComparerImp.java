@@ -56,8 +56,8 @@ public class ChildComparerImp implements ChildComparer {
 
 	private void checkDataGroupContainsChild(ClientDataGroup dataGroup, List<String> errorMessages,
 			JsonObject childObject) {
-		JsonString value = getStringValue(childObject);
-		String nameInData = value.getStringValue();
+		JsonString name = getName(childObject);
+		String nameInData = name.getStringValue();
 		addErrorMessageIfChildIsMissing(dataGroup, nameInData, errorMessages);
 	}
 
@@ -67,12 +67,16 @@ public class ChildComparerImp implements ChildComparer {
 
 	private void addErrorMessageIfChildIsMissing(ClientDataGroup dataGroup, String nameInData,
 			List<String> errorMessages) {
-		if (!dataGroup.containsChildWithNameInData(nameInData)) {
-			errorMessages.add("Child with nameInData " + nameInData + " is missing.");
+		if (childIsMissing(dataGroup, nameInData)) {
+			errorMessages.add(constructMissingMessage(nameInData));
 		}
 	}
 
-	private JsonString getStringValue(JsonObject child) {
+	private String constructMissingMessage(String nameInData) {
+		return "Child with nameInData " + nameInData + " is missing.";
+	}
+
+	private JsonString getName(JsonObject child) {
 		throwErrorIfMissingKey(child);
 		return (JsonString) child.getValue("name");
 	}
@@ -80,6 +84,80 @@ public class ChildComparerImp implements ChildComparer {
 	private void throwErrorIfMissingKey(JsonObject child) {
 		if (!child.containsKey("name")) {
 			throw new JsonParseException("child must contain key: name");
+		}
+	}
+
+	@Override
+	public List<String> checkDataGroupContainsChildrenWithCorrectValues(ClientDataGroup dataGroup,
+			JsonValue jsonValue) {
+		try {
+			return tryToCheckDataGroupContainsChildrenWithCorrectValues(dataGroup, jsonValue);
+		} catch (Exception e) {
+			throw new JsonParseException(e.getMessage());
+		}
+	}
+
+	private List<String> tryToCheckDataGroupContainsChildrenWithCorrectValues(
+			ClientDataGroup dataGroup, JsonValue jsonValue) {
+		List<String> errorMessages = new ArrayList<>();
+		for (JsonValue childValue : extractChildren((JsonObject) jsonValue)) {
+			checkDataGroupContainsChildWithCorrectValue(dataGroup, errorMessages,
+					(JsonObject) childValue);
+		}
+		return errorMessages;
+	}
+
+	private void checkDataGroupContainsChildWithCorrectValue(ClientDataGroup dataGroup,
+			List<String> errorMessages, JsonObject childObject) {
+		String nameInData = getNameInData(childObject);
+		if (childIsMissing(dataGroup, nameInData)) {
+			errorMessages.add(constructMissingMessage(nameInData));
+		} else {
+			checkChildValues(dataGroup, errorMessages, childObject, nameInData);
+		}
+	}
+
+	private boolean childIsMissing(ClientDataGroup dataGroup, String nameInData) {
+		return !dataGroup.containsChildWithNameInData(nameInData);
+	}
+
+	private void checkChildValues(ClientDataGroup dataGroup, List<String> errorMessages,
+			JsonObject childObject, String nameInData) {
+		if (isAtomicType(childObject)) {
+			checkAtomicChild(dataGroup, errorMessages, childObject, nameInData);
+		} else {
+			checkDataGroup(errorMessages, dataGroup, childObject, nameInData);
+		}
+	}
+
+	private String getNameInData(JsonObject childObject) {
+		JsonString name = getName(childObject);
+		return name.getStringValue();
+	}
+
+	private void checkDataGroup(List<String> errorMessages, ClientDataGroup dataGroup,
+			JsonObject groupObject, String nameInData) {
+		ClientDataGroup childGroup = dataGroup.getFirstGroupWithNameInData(nameInData);
+
+		JsonArray children = groupObject.getValueAsJsonArray("children");
+		for (JsonValue childValue : children) {
+			JsonObject childObject = (JsonObject) childValue;
+			checkDataGroupContainsChildWithCorrectValue(childGroup, errorMessages, childObject);
+		}
+	}
+
+	private boolean isAtomicType(JsonObject childObject) {
+		JsonString type = (JsonString) childObject.getValue("type");
+		return "atomic".equals(type.getStringValue());
+	}
+
+	private void checkAtomicChild(ClientDataGroup dataGroup, List<String> errorMessages,
+			JsonObject childObject, String nameInData) {
+		JsonString value = (JsonString) childObject.getValue("value");
+		String atomicValue = dataGroup.getFirstAtomicValueWithNameInData(nameInData);
+		if (!atomicValue.equals(value.getStringValue())) {
+			errorMessages.add(
+					"Child with nameInData " + nameInData + " does not have the correct value.");
 		}
 	}
 

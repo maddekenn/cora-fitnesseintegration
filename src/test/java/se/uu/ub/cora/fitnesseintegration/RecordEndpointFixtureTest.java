@@ -521,4 +521,30 @@ public class RecordEndpointFixtureTest {
 		assertEquals(fixture.testReadCheckContain(), childComparer.errorMessage);
 	}
 
+	@Test
+	public void testReadCheckContainWithValuesSendsResultBetweenObjectsCorrectly() {
+		jsonToDataConverter = new JsonToDataRecordConverterSpy();
+		String childrenToLookFor = "{\"doesContain\":[{\"textVariable\":\"workoutName\"}]}";
+		setUpFixtureForReadCheckContain(childrenToLookFor);
+		fixture.testReadCheckContainWithValues();
+
+		assertHttpResponseIsParsedAndResultSentToConverter();
+
+		ChildComparerSpy childComparer = (ChildComparerSpy) fixture.getChildComparer();
+
+		assertDataGroupFromReadRecordIsUsedInChildComparer(childComparer);
+
+		assertChildrenStringIsParsedAndResultSentToComparer(childrenToLookFor, childComparer);
+
+	}
+
+	@Test
+	public void testReadCheckContainWithValuesResultOK() {
+		jsonToDataConverter = new JsonToDataRecordConverterSpy();
+		String childrenToLookFor = "{\"children\":[{\"type\":\"atomic\",\"name\":\"workoutName\",\"value\":\"cirkelfys\"}]}";
+		setUpFixtureForReadCheckContain(childrenToLookFor);
+
+		assertEquals(fixture.testReadCheckContainWithValues(), "OK");
+	}
+
 }

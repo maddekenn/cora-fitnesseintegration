@@ -57,4 +57,13 @@ public class ChildComparerSpy implements ChildComparer {
 		return listToReturn;
 	}
 
+	@Override
+	public List<String> checkDataGroupContainsChildrenWithCorrectValues(ClientDataGroup dataGroup,
+			JsonValue jsonValue) {
+		this.dataGroup = dataGroup;
+		this.jsonValue = jsonValue;
+		listToReturn = new ArrayList<>();
+		return listToReturn;
+	}
+
 }

@@ -52,10 +52,10 @@ public class ChildComparerTest {
 	@Test
 	public void testCheckContainOKWhenOneChild() {
 		JsonValue jsonValue = jsonParser.parseString("{\"children\":[{\"name\":\"workoutName\"}]}");
-		List<String> errorMessages = childComparer.checkDataGroupContainsChildren(dataGroup, jsonValue);
-		assertTrue(errorMessages.isEmpty());
-		boolean containsChildren = childComparer.dataGroupContainsChildren(dataGroup,
+		List<String> errorMessages = childComparer.checkDataGroupContainsChildren(dataGroup,
 				jsonValue);
+		assertTrue(errorMessages.isEmpty());
+		boolean containsChildren = childComparer.dataGroupContainsChildren(dataGroup, jsonValue);
 		assertTrue(containsChildren);
 
 	}
@@ -63,7 +63,8 @@ public class ChildComparerTest {
 	@Test
 	public void testContainOKWhenOneChild() {
 		JsonValue jsonValue = jsonParser.parseString("{\"children\":[{\"name\":\"workoutName\"}]}");
-		List<String> errorMessages = childComparer.checkDataGroupContainsChildren(dataGroup, jsonValue);
+		List<String> errorMessages = childComparer.checkDataGroupContainsChildren(dataGroup,
+				jsonValue);
 		assertTrue(errorMessages.isEmpty());
 
 	}
@@ -74,8 +75,7 @@ public class ChildComparerTest {
 
 		JsonValue jsonValue = jsonParser.parseString(
 				"{\"children\":[{\"name\":\"workoutName\"},{\"name\":\"instructorId\"}]}");
-		boolean containsChildren = childComparer.dataGroupContainsChildren(dataGroup,
-				jsonValue);
+		boolean containsChildren = childComparer.dataGroupContainsChildren(dataGroup, jsonValue);
 		assertTrue(containsChildren);
 
 	}
@@ -85,7 +85,8 @@ public class ChildComparerTest {
 		dataGroup.addChild(ClientDataAtomic.withNameInDataAndValue("instructorId", "45"));
 		JsonValue jsonValue = jsonParser.parseString(
 				"{\"children\":[{\"name\":\"workoutName\"},{\"name\":\"instructorId\"}]}");
-		List<String> errorMessages = childComparer.checkDataGroupContainsChildren(dataGroup, jsonValue);
+		List<String> errorMessages = childComparer.checkDataGroupContainsChildren(dataGroup,
+				jsonValue);
 		assertTrue(errorMessages.isEmpty());
 	}
 
@@ -93,12 +94,12 @@ public class ChildComparerTest {
 	public void testCheckContainNotOKNoChildExistInDataGroup() {
 		dataGroup = ClientDataGroup.withNameInData("someDataGroup");
 		JsonValue jsonValue = jsonParser.parseString("{\"children\":[{\"name\":\"workoutName\"}]}");
-		List<String> errorMessages = childComparer.checkDataGroupContainsChildren(dataGroup, jsonValue);
+		List<String> errorMessages = childComparer.checkDataGroupContainsChildren(dataGroup,
+				jsonValue);
 		assertEquals(errorMessages.size(), 1);
 		assertEquals(errorMessages.get(0), "Child with nameInData workoutName is missing.");
 
-		boolean containsChildren = childComparer.dataGroupContainsChildren(dataGroup,
-				jsonValue);
+		boolean containsChildren = childComparer.dataGroupContainsChildren(dataGroup, jsonValue);
 		assertFalse(containsChildren);
 	}
 
@@ -106,7 +107,8 @@ public class ChildComparerTest {
 	public void testContainNotOKNoChildExistInDataGroup() {
 		dataGroup = ClientDataGroup.withNameInData("someDataGroup");
 		JsonValue jsonValue = jsonParser.parseString("{\"children\":[{\"name\":\"workoutName\"}]}");
-		List<String> errorMessages = childComparer.checkDataGroupContainsChildren(dataGroup, jsonValue);
+		List<String> errorMessages = childComparer.checkDataGroupContainsChildren(dataGroup,
+				jsonValue);
 		assertEquals(errorMessages.size(), 1);
 		assertEquals(errorMessages.get(0), "Child with nameInData workoutName is missing.");
 
@@ -116,8 +118,7 @@ public class ChildComparerTest {
 	public void testCheckContainOneButNotTheOther() {
 		JsonValue jsonValue = jsonParser.parseString(
 				"{\"children\":[{\"name\":\"workoutName\"},{\"name\":\"instructorId\"}]}");
-		boolean containsChildren = childComparer.dataGroupContainsChildren(dataGroup,
-				jsonValue);
+		boolean containsChildren = childComparer.dataGroupContainsChildren(dataGroup, jsonValue);
 		assertFalse(containsChildren);
 
 	}
@@ -126,7 +127,8 @@ public class ChildComparerTest {
 	public void testContainOneButNotTheOther() {
 		JsonValue jsonValue = jsonParser.parseString(
 				"{\"children\":[{\"name\":\"workoutName\"},{\"name\":\"instructorId\"}]}");
-		List<String> errorMessages = childComparer.checkDataGroupContainsChildren(dataGroup, jsonValue);
+		List<String> errorMessages = childComparer.checkDataGroupContainsChildren(dataGroup,
+				jsonValue);
 		assertEquals(errorMessages.size(), 1);
 		assertEquals(errorMessages.get(0), "Child with nameInData instructorId is missing.");
 
@@ -137,7 +139,8 @@ public class ChildComparerTest {
 		dataGroup = ClientDataGroup.withNameInData("someDataGroup");
 		JsonValue jsonValue = jsonParser.parseString(
 				"{\"children\":[{\"name\":\"workoutName\"},{\"name\":\"instructorId\"}]}");
-		List<String> errorMessages = childComparer.checkDataGroupContainsChildren(dataGroup, jsonValue);
+		List<String> errorMessages = childComparer.checkDataGroupContainsChildren(dataGroup,
+				jsonValue);
 		assertEquals(errorMessages.size(), 2);
 		assertEquals(errorMessages.get(0), "Child with nameInData workoutName is missing.");
 		assertEquals(errorMessages.get(1), "Child with nameInData instructorId is missing.");
@@ -150,5 +153,68 @@ public class ChildComparerTest {
 		JsonValue jsonValue = jsonParser
 				.parseString("{\"children\":[{\"NOTname\":\"workoutName\"}]}");
 		childComparer.checkDataGroupContainsChildren(dataGroup, jsonValue);
+	}
+
+	@Test
+	public void testCheckCorrectValuesOKWhenOneAtomicChild() {
+		JsonValue jsonValue = jsonParser.parseString(
+				"{\"children\":[{\"type\":\"atomic\",\"name\":\"workoutName\",\"value\":\"cirkelfys\"}]}");
+		List<String> errorMessages = childComparer
+				.checkDataGroupContainsChildrenWithCorrectValues(dataGroup, jsonValue);
+		assertTrue(errorMessages.isEmpty());
+
+	}
+
+	@Test
+	public void testCheckCorrectValuesNotOKWhenChildValueDiffers() {
+		JsonValue jsonValue = jsonParser.parseString(
+				"{\"children\":[{\"type\":\"atomic\",\"name\":\"workoutName\",\"value\":\"NOTcirkelfys\"}]}");
+		List<String> errorMessages = childComparer
+				.checkDataGroupContainsChildrenWithCorrectValues(dataGroup, jsonValue);
+		assertEquals(errorMessages.size(), 1);
+		assertEquals(errorMessages.get(0),
+				"Child with nameInData workoutName does not have the correct value.");
+	}
+
+	@Test
+	public void testCheckCorrectValuesOKWhenOneAtomicChildAndOneGroupChild() {
+		ClientDataGroup instructorName = ClientDataGroup.withNameInData("instructorName");
+		instructorName.addChild(ClientDataAtomic.withNameInDataAndValue("firstName", "Anna"));
+		dataGroup.addChild(instructorName);
+		JsonValue jsonValue = jsonParser.parseString(
+				"{\"children\":[{\"type\":\"atomic\",\"name\":\"workoutName\",\"value\":\"cirkelfys\"},{\"type\":\"group\",\"name\":\"instructorName\",\"children\":[{\"type\":\"atomic\",\"name\":\"firstName\",\"value\":\"Anna\"}]}]}");
+		List<String> errorMessages = childComparer
+				.checkDataGroupContainsChildrenWithCorrectValues(dataGroup, jsonValue);
+		assertTrue(errorMessages.isEmpty());
+	}
+
+	@Test
+	public void testCorrectValuesNotOKWhenOneGrandChildValueDiffers() {
+		ClientDataGroup instructorName = ClientDataGroup.withNameInData("instructorName");
+		instructorName.addChild(ClientDataAtomic.withNameInDataAndValue("firstName", "Anna"));
+		dataGroup.addChild(instructorName);
+		JsonValue jsonValue = jsonParser.parseString(
+				"{\"children\":[{\"type\":\"atomic\",\"name\":\"workoutName\",\"value\":\"cirkelfys\"},{\"type\":\"group\",\"name\":\"instructorName\",\"children\":[{\"type\":\"atomic\",\"name\":\"firstName\",\"value\":\"NOTAnna\"}]}]}");
+		List<String> errorMessages = childComparer
+				.checkDataGroupContainsChildrenWithCorrectValues(dataGroup, jsonValue);
+		assertEquals(errorMessages.size(), 1);
+		assertEquals(errorMessages.get(0),
+				"Child with nameInData firstName does not have the correct value.");
+	}
+
+	@Test
+	public void testCorrectValuesNotOKWhenOneGrandChildIsMissingOneGrandChildValueDiffers() {
+		ClientDataGroup instructorName = ClientDataGroup.withNameInData("instructorName");
+		instructorName.addChild(ClientDataAtomic.withNameInDataAndValue("firstName", "Anna"));
+		instructorName.addChild(ClientDataAtomic.withNameInDataAndValue("lastName", "Ledare"));
+		dataGroup.addChild(instructorName);
+		JsonValue jsonValue = jsonParser.parseString(
+				"{\"children\":[{\"type\":\"atomic\",\"name\":\"workoutName\",\"value\":\"cirkelfys\"},{\"type\":\"group\",\"name\":\"instructorName\",\"children\":[{\"type\":\"atomic\",\"name\":\"firstName\",\"value\":\"NOTAnna\"},{\"type\":\"atomic\",\"name\":\"NOTlastName\",\"value\":\"Ledare\"}]}]}");
+		List<String> errorMessages = childComparer
+				.checkDataGroupContainsChildrenWithCorrectValues(dataGroup, jsonValue);
+		assertEquals(errorMessages.size(), 2);
+		assertEquals(errorMessages.get(0),
+				"Child with nameInData firstName does not have the correct value.");
+		assertEquals(errorMessages.get(1), "Child with nameInData NOTlastName is missing.");
 	}
 }

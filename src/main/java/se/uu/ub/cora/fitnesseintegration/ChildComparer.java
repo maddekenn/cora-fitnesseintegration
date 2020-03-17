@@ -29,4 +29,6 @@ public interface ChildComparer {
 
 	List<String> checkDataGroupContainsChildren(ClientDataGroup dataGroup, JsonValue jsonValue);
 
+	List<String> checkDataGroupContainsChildrenWithCorrectValues(ClientDataGroup dataGroup,
+			JsonValue jsonValue);
 }
