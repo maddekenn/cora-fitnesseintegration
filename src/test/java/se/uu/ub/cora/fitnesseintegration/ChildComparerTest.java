@@ -229,4 +229,12 @@ public class ChildComparerTest {
 		assertEquals(errorMessages.get(1),
 				"Child with nameInData NOTlastName and type atomic is missing.");
 	}
+
+	@Test(expectedExceptions = JsonParseException.class, expectedExceptionsMessageRegExp = ""
+			+ "child must contain key: name")
+	public void testCheckCorrectValuesJsonValueDoesNotContainName() {
+		JsonValue jsonValue = jsonParser
+				.parseString("{\"children\":[{\"NOTname\":\"workoutName\"}]}");
+		childComparer.checkDataGroupContainsChildrenWithCorrectValues(dataGroup, jsonValue);
+	}
 }
