@@ -476,4 +476,25 @@ public class RecordEndpointFixture {
 		// needed for test
 		this.jsonHandler = jsonHandler;
 	}
+
+	public String testReadCheckContainWithValues() {
+		String readJson = testReadRecord();
+		JsonObject jsonObject = jsonHandler.parseStringAsObject(readJson);
+		DataRecord record = (DataRecord) jsonToDataRecordConverter.toInstance(jsonObject);
+
+		JsonObject childrenObject = jsonHandler.parseStringAsObject(childrenToCompare);
+		return tryToCompareChildrenWithCorrectValues(record, childrenObject);
+	}
+
+	private String tryToCompareChildrenWithCorrectValues(DataRecord record,
+			JsonObject childrenObject) {
+		try {
+			List<String> errorMessages = childComparer
+					.checkDataGroupContainsChildrenWithCorrectValues(record.getClientDataGroup(),
+							childrenObject);
+			return errorMessages.isEmpty() ? "OK" : joinErrorMessages(errorMessages);
+		} catch (JsonParseException exception) {
+			return exception.getMessage();
+		}
+	}
 }

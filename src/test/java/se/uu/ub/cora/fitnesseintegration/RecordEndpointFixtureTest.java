@@ -521,4 +521,56 @@ public class RecordEndpointFixtureTest {
 		assertEquals(fixture.testReadCheckContain(), childComparer.errorMessage);
 	}
 
+	@Test
+	public void testReadCheckContainWithValuesSendsResultBetweenObjectsCorrectly() {
+		jsonToDataConverter = new JsonToDataRecordConverterSpy();
+		String childrenToLookFor = "{\"doesContain\":[{\"textVariable\":\"workoutName\"}]}";
+		setUpFixtureForReadCheckContain(childrenToLookFor);
+		fixture.testReadCheckContainWithValues();
+
+		assertHttpResponseIsParsedAndResultSentToConverter();
+
+		ChildComparerSpy childComparer = (ChildComparerSpy) fixture.getChildComparer();
+
+		assertDataGroupFromReadRecordIsUsedInChildComparer(childComparer);
+
+		assertChildrenStringIsParsedAndResultSentToComparer(childrenToLookFor, childComparer);
+
+	}
+
+	@Test
+	public void testReadCheckContainWithValuesResultOK() {
+		jsonToDataConverter = new JsonToDataRecordConverterSpy();
+		String childrenToLookFor = "{\"children\":[{\"type\":\"atomic\",\"name\":\"workoutName\",\"value\":\"cirkelfys\"}]}";
+		setUpFixtureForReadCheckContain(childrenToLookFor);
+
+		assertEquals(fixture.testReadCheckContainWithValues(), "OK");
+	}
+
+	@Test
+	public void testReadCheckContainWithValuesResultNotOK() {
+		jsonToDataConverter = new JsonToDataRecordConverterSpy();
+		String childrenToLookFor = "{\"children\":[{\"type\":\"atomic\",\"name\":\"workoutName\",\"value\":\"cirkelfys\"}]}";
+		setUpFixtureForReadCheckContain(childrenToLookFor);
+
+		ChildComparerSpy childComparer = (ChildComparerSpy) fixture.getChildComparer();
+		childComparer.numberToReturn = 3;
+
+		assertEquals(fixture.testReadCheckContainWithValues(),
+				"From spy: Child with number 0 is missing. "
+						+ "From spy: Child with number 1 is missing. "
+						+ "From spy: Child with number 2 is missing.");
+	}
+
+	@Test
+	public void testReadCheckContainWithValuesComparerThrowsError() {
+		jsonToDataConverter = new JsonToDataRecordConverterSpy();
+		String childrenToLookFor = "{\"children\":[{\"type\":\"atomic\",\"name\":\"workoutName\",\"value\":\"cirkelfys\"}]}";
+		setUpFixtureForReadCheckContain(childrenToLookFor);
+		ChildComparerSpy childComparer = (ChildComparerSpy) fixture.getChildComparer();
+		childComparer.spyShouldThrowError = true;
+
+		assertEquals(fixture.testReadCheckContainWithValues(), childComparer.errorMessage);
+	}
+
 }

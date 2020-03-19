@@ -45,15 +45,34 @@ public class ChildComparerSpy implements ChildComparer {
 			JsonValue jsonValue) {
 		this.dataGroup = dataGroup;
 		this.jsonValue = jsonValue;
-		if (spyShouldThrowError) {
-			errorMessage = "error from spy";
-			throw new JsonParseException(errorMessage);
-		}
+		possiblyThrowError();
 		listToReturn = new ArrayList<>();
+		possiblyAddErrorMessages();
+		return listToReturn;
+	}
+
+	private void possiblyAddErrorMessages() {
 		for (int i = 0; i < numberToReturn; i++) {
 			String errorMessage = "From spy: Child with number " + i + " is missing.";
 			listToReturn.add(errorMessage);
 		}
+	}
+
+	private void possiblyThrowError() {
+		if (spyShouldThrowError) {
+			errorMessage = "error from spy";
+			throw new JsonParseException(errorMessage);
+		}
+	}
+
+	@Override
+	public List<String> checkDataGroupContainsChildrenWithCorrectValues(ClientDataGroup dataGroup,
+			JsonValue jsonValue) {
+		this.dataGroup = dataGroup;
+		this.jsonValue = jsonValue;
+		possiblyThrowError();
+		listToReturn = new ArrayList<>();
+		possiblyAddErrorMessages();
 		return listToReturn;
 	}
 
