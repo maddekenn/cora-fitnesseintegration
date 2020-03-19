@@ -177,6 +177,17 @@ public class ChildComparerTest {
 	}
 
 	@Test
+	public void testCheckCorrectValuesNotOKWhenChildTypeDiffers() {
+		JsonValue jsonValue = jsonParser.parseString(
+				"{\"children\":[{\"type\":\"group\",\"name\":\"workoutName\",\"value\":\"NOTcirkelfys\"}]}");
+		List<String> errorMessages = childComparer
+				.checkDataGroupContainsChildrenWithCorrectValues(dataGroup, jsonValue);
+		assertEquals(errorMessages.size(), 1);
+		assertEquals(errorMessages.get(0),
+				"Child with nameInData workoutName and type group is missing.");
+	}
+
+	@Test
 	public void testCheckCorrectValuesOKWhenOneAtomicChildAndOneGroupChild() {
 		ClientDataGroup instructorName = ClientDataGroup.withNameInData("instructorName");
 		instructorName.addChild(ClientDataAtomic.withNameInDataAndValue("firstName", "Anna"));
@@ -215,6 +226,7 @@ public class ChildComparerTest {
 		assertEquals(errorMessages.size(), 2);
 		assertEquals(errorMessages.get(0),
 				"Child with nameInData firstName does not have the correct value.");
-		assertEquals(errorMessages.get(1), "Child with nameInData NOTlastName is missing.");
+		assertEquals(errorMessages.get(1),
+				"Child with nameInData NOTlastName and type atomic is missing.");
 	}
 }
