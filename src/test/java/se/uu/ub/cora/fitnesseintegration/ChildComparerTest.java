@@ -156,6 +156,18 @@ public class ChildComparerTest {
 	}
 
 	@Test
+	public void testJsonValueDoesNotContainNameInitalExceptionIsSentAlong() {
+		JsonValue jsonValue = jsonParser
+				.parseString("{\"children\":[{\"NOTname\":\"workoutName\"}]}");
+		try {
+			childComparer.checkDataGroupContainsChildren(dataGroup, jsonValue);
+
+		} catch (Exception e) {
+			assertTrue(e.getCause() instanceof JsonParseException);
+		}
+	}
+
+	@Test
 	public void testCheckCorrectValuesOKWhenOneAtomicChild() {
 		JsonValue jsonValue = jsonParser.parseString(
 				"{\"children\":[{\"type\":\"atomic\",\"name\":\"workoutName\",\"value\":\"cirkelfys\"}]}");
@@ -236,5 +248,17 @@ public class ChildComparerTest {
 		JsonValue jsonValue = jsonParser
 				.parseString("{\"children\":[{\"NOTname\":\"workoutName\"}]}");
 		childComparer.checkDataGroupContainsChildrenWithCorrectValues(dataGroup, jsonValue);
+	}
+
+	@Test
+	public void testCheckCorrectValuesJsonValueDoesNotContainNameInitalExceptionIsSentAlong() {
+		JsonValue jsonValue = jsonParser
+				.parseString("{\"children\":[{\"NOTname\":\"workoutName\"}]}");
+		try {
+			childComparer.checkDataGroupContainsChildrenWithCorrectValues(dataGroup, jsonValue);
+
+		} catch (Exception e) {
+			assertTrue(e.getCause() instanceof JsonParseException);
+		}
 	}
 }

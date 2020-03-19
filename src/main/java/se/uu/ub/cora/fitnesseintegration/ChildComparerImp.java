@@ -41,8 +41,8 @@ public class ChildComparerImp implements ChildComparer {
 			JsonValue jsonValue) {
 		try {
 			return tryToCheckDataGroupContainsChildren(dataGroup, jsonValue);
-		} catch (Exception e) {
-			throw new JsonParseException(e.getMessage());
+		} catch (Exception exception) {
+			throw new JsonParseException(exception.getMessage(), exception);
 		}
 	}
 
@@ -97,8 +97,8 @@ public class ChildComparerImp implements ChildComparer {
 			JsonValue jsonValue) {
 		try {
 			return tryToCheckDataGroupContainsChildrenWithCorrectValues(dataGroup, jsonValue);
-		} catch (Exception e) {
-			throw new JsonParseException(e.getMessage());
+		} catch (Exception exception) {
+			throw new JsonParseException(exception.getMessage(), exception);
 		}
 	}
 
