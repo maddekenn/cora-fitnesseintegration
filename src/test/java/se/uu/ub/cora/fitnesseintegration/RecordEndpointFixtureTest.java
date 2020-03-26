@@ -42,7 +42,6 @@ public class RecordEndpointFixtureTest {
 	private HttpHandlerFactorySpy httpHandlerFactorySpy;
 	private JsonHandler jsonHandler;
 	private JsonParserSpy jsonParser;
-	// private JsonToDataRecordConverterSpy jsonToDataConverter;
 	private JsonToDataRecordConverterSpy jsonToDataConverter;
 
 	@BeforeMethod

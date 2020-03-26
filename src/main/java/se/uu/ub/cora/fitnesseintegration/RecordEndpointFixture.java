@@ -462,7 +462,7 @@ public class RecordEndpointFixture {
 		return childComparer;
 	}
 
-	public JsonToDataRecordConverter getJsonToDataRecordConverter() {
+	JsonToDataRecordConverter getJsonToDataRecordConverter() {
 		// needed for test
 		return jsonToDataRecordConverter;
 	}
@@ -472,7 +472,7 @@ public class RecordEndpointFixture {
 		return jsonHandler;
 	}
 
-	public void setJsonHandler(JsonHandler jsonHandler) {
+	void setJsonHandler(JsonHandler jsonHandler) {
 		// needed for test
 		this.jsonHandler = jsonHandler;
 	}
