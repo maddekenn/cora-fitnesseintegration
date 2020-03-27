@@ -18,23 +18,37 @@
  */
 package se.uu.ub.cora.fitnesseintegration;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import se.uu.ub.cora.clientdata.DataRecord;
 
-public class RecordHolder {
+public class DataHolder {
 
-	public RecordHolder() {
+	public DataHolder() {
 		// needed by fitnesse
 		super();
 	}
 
 	private static DataRecord clientDataRecord;
+	private static List<DataRecord> dataRecords;
 
 	public static void setRecord(DataRecord clientDataRecord) {
-		RecordHolder.clientDataRecord = clientDataRecord;
+		DataHolder.clientDataRecord = clientDataRecord;
 	}
 
 	public static DataRecord getRecord() {
 		return clientDataRecord;
+	}
+
+	public static void setRecordList(List<DataRecord> recordList) {
+		dataRecords = new ArrayList<>();
+		dataRecords.addAll(recordList);
+
+	}
+
+	public static List<DataRecord> getRecordList() {
+		return dataRecords;
 	}
 
 }

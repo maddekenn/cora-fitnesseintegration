@@ -401,7 +401,7 @@ public class RecordEndpointFixture {
 		String responseText = testReadRecord();
 		DataRecord clientDataRecord = convertJsonToClientDataRecord(responseText);
 
-		RecordHolder.setRecord(clientDataRecord);
+		DataHolder.setRecord(clientDataRecord);
 	}
 
 	protected DataRecord convertJsonToClientDataRecord(String responseText) {

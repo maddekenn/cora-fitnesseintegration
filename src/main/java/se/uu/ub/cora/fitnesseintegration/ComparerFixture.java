@@ -22,6 +22,7 @@ public class ComparerFixture {
 
 	private RecordHandler recordHandler;
 	private String type;
+	private String storedListAsJson;
 
 	public ComparerFixture() {
 		recordHandler = new RecordHandlerImp();
@@ -29,7 +30,7 @@ public class ComparerFixture {
 
 	public void testReadRecordListAndStoreRecords() {
 		String baseUrl = SystemUrl.getUrl() + "rest/record/";
-		String json = recordHandler.readRecordList(baseUrl + type);
+		storedListAsJson = recordHandler.readRecordList(baseUrl + type);
 
 	}
 
@@ -46,6 +47,29 @@ public class ComparerFixture {
 		this.recordHandler = recordHandler;
 
 	}
+
+	public String getStoredListAsJson() {
+		return storedListAsJson;
+	}
+
+	public void setListIndexToCompareTo(int index) {
+		// TODO Auto-generated method stub
+
+	}
+
+	public String testReadFromListCheckContain() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	// private String testReadCheckContain() {
+	// JsonObject jsonObject = jsonHandler.parseStringAsObject(readJson);
+	// DataRecord record = (DataRecord) jsonToDataRecordConverter.toInstance(jsonObject);
+	//
+	// JsonObject childrenObject = jsonHandler.parseStringAsObject(childrenToCompare);
+	// return tryToCompareChildren(record, childrenObject);
+
+	// }
 
 	// public void testReadRecordAndStoreJson() {
 	// String responseText = testReadRecordList();

@@ -22,12 +22,15 @@ public class RecordHandlerSpy implements RecordHandler {
 
 	public boolean readRecordListWasCalled = false;
 	public String url;
+	public String jsonToReturn;
 
 	@Override
 	public String readRecordList(String url) {
 		readRecordListWasCalled = true;
 		this.url = url;
-		return null;
+
+		jsonToReturn = "some json returned from spy";
+		return jsonToReturn;
 	}
 
 }

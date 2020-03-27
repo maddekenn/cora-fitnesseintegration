@@ -28,11 +28,13 @@ public class CompararerFixtureTest {
 
 	private ComparerFixture fixture;
 	private RecordHandlerSpy recordHandler;
+	private JsonToDataRecordConverterSpy jsonToDataConverter;
 
 	@BeforeMethod
 	public void setUp() {
 		SystemUrl.setUrl("http://localhost:8080/therest/");
 		fixture = new ComparerFixture();
+		fixture.setType("someRecordType");
 		recordHandler = new RecordHandlerSpy();
 		fixture.setRecordHandler(recordHandler);
 	}
@@ -45,12 +47,44 @@ public class CompararerFixtureTest {
 
 	@Test
 	public void testReadRecordListAndStoreRecords() {
-		fixture.setType("someRecordType");
 		fixture.testReadRecordListAndStoreRecords();
 		assertTrue(recordHandler.readRecordListWasCalled);
 
 		String expectedUrl = SystemUrl.getUrl() + "rest/record/someRecordType";
 		assertEquals(recordHandler.url, expectedUrl);
+		assertEquals(fixture.getStoredListAsJson(), recordHandler.jsonToReturn);
+	}
+
+	@Test
+	public void testListAsJsonIsConverterdAndStoredInDataHolder() {
+		fixture.testReadRecordListAndStoreRecords();
+
+	}
+
+	// @Test
+	// public void testReadCheckContainResultOK() {
+	// jsonToDataConverter = new JsonToDataRecordConverterSpy();
+	// String childrenToLookFor = "{\"doesContain\":[{\"textVariable\":\"workoutName\"}]}";
+	// setUpFixtureForReadCheckContain(childrenToLookFor);
+	//
+	// assertEquals(fixture.testReadCheckContain(), "OK");
+	// }
+
+	// private void setUpFixtureForReadCheckContain(String childrenToLookFor) {
+	// fixture.setJsonHandler(jsonHandler);
+	//
+	// fixture.setJsonToDataRecordConverter(jsonToDataConverter);
+	//
+	// fixture.setType("someCheckChildrenOkType");
+	// fixture.setId("someId");
+	// fixture.setChildren(childrenToLookFor);
+	// }
+
+	@Test
+	public void testReadCheckContainRecordInList() {
+		fixture.testReadRecordListAndStoreRecords();
+		fixture.setListIndexToCompareTo(1);
+		String result = fixture.testReadFromListCheckContain();
 	}
 
 }

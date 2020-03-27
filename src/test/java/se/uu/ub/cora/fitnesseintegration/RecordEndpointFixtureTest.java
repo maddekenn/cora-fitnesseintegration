@@ -433,8 +433,8 @@ public class RecordEndpointFixtureTest {
 		fixture.setAuthToken("someToken");
 		fixture.testReadRecordAndStoreJson();
 
-		assertNotEquals(RecordHolder.getRecord(), null);
-		assertTrue(RecordHolder.getRecord() instanceof ClientDataRecord);
+		assertNotEquals(DataHolder.getRecord(), null);
+		assertTrue(DataHolder.getRecord() instanceof ClientDataRecord);
 	}
 
 	@Test
