@@ -19,7 +19,10 @@
 package se.uu.ub.cora.fitnesseintegration;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertSame;
 import static org.testng.Assert.assertTrue;
+
+import java.util.List;
 
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -29,14 +32,21 @@ public class CompararerFixtureTest {
 	private ComparerFixture fixture;
 	private RecordHandlerSpy recordHandler;
 	private JsonToDataRecordConverterSpy jsonToDataConverter;
+	private JsonParserSpy jsonParser;
+	private JsonHandlerImp jsonHandler;
 
 	@BeforeMethod
 	public void setUp() {
 		SystemUrl.setUrl("http://localhost:8080/therest/");
+		jsonParser = new JsonParserSpy();
+		jsonHandler = JsonHandlerImp.usingJsonParser(jsonParser);
 		fixture = new ComparerFixture();
 		fixture.setType("someRecordType");
 		recordHandler = new RecordHandlerSpy();
 		fixture.setRecordHandler(recordHandler);
+		fixture.setJsonHandler(jsonHandler);
+		jsonToDataConverter = new JsonToDataRecordConverterSpy();
+		fixture.setJsonToDataRecordConverter(jsonToDataConverter);
 	}
 
 	@Test
@@ -56,7 +66,7 @@ public class CompararerFixtureTest {
 	}
 
 	@Test
-	public void testListAsJsonIsConverterdAndStoredInDataHolder() {
+	public void testListAsJsonIsConvertedAndStoredInDataHolder() {
 		fixture.testReadRecordListAndStoreRecords();
 
 	}
@@ -85,6 +95,27 @@ public class CompararerFixtureTest {
 		fixture.testReadRecordListAndStoreRecords();
 		fixture.setListIndexToCompareTo(1);
 		String result = fixture.testReadFromListCheckContain();
+
+		String jsonListFromRecordHandler = recordHandler.jsonToReturn;
+		String jsonListSentToParser = jsonParser.jsonStringsSentToParser.get(0);
+		assertEquals(jsonListSentToParser, jsonListFromRecordHandler);
+
+		JsonObjectSpy listObjectFromSpy = jsonParser.jsonObjectSpies.get(0);
+		assertEquals(listObjectFromSpy.getValueKeys.get(0), "dataList");
+
+		JsonObjectSpy dataList = listObjectFromSpy.getValueObjectsReturned.get(0);
+		assertEquals(dataList.getValueKeys.get(0), "data");
+
+		JsonArraySpy data = dataList.getValueArraysReturned.get(0);
+		IteratorSpy returnedIterator = data.returnedIterator;
+		assertTrue(returnedIterator.hasNextWasCalled);
+
+		List<JsonObjectSpy> objectsReturnedFromNext = returnedIterator.objectsReturnedFromNext;
+		assertSame(jsonToDataConverter.jsonObjects.get(0), objectsReturnedFromNext.get(0));
+		assertSame(jsonToDataConverter.jsonObjects.get(1), objectsReturnedFromNext.get(1));
+
+		// TODO: kolla att resultatet från convertern läggs i listan i dataHolder
+
 	}
 
 }
