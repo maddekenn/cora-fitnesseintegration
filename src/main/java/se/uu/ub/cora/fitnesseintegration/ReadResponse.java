@@ -18,20 +18,16 @@
  */
 package se.uu.ub.cora.fitnesseintegration;
 
-public class RecordHandlerSpy implements RecordHandler {
+import javax.ws.rs.core.Response.StatusType;
 
-	public boolean readRecordListWasCalled = false;
-	public String url;
-	public String jsonToReturn;
+public class ReadResponse {
 
-	@Override
-	public ReadResponse readRecordList(String url, String filter, String authToken) {
-		readRecordListWasCalled = true;
-		this.url = url;
+	public final StatusType statusType;
+	public final String responseText;
 
-		jsonToReturn = "some json returned from spy";
-		return new ReadResponse(new StatusTypeSpy(), jsonToReturn);
-		// return jsonToReturn;
+	public ReadResponse(StatusType statusType, String responseText) {
+		this.statusType = statusType;
+		this.responseText = responseText;
 	}
 
 }

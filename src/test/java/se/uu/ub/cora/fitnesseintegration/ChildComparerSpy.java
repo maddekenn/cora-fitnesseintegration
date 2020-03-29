@@ -29,7 +29,7 @@ public class ChildComparerSpy implements ChildComparer {
 
 	public ClientDataGroup dataGroup;
 	public JsonValue jsonValue;
-	public int numberToReturn = 0;
+	public int numberOfErrorsToReturn = 0;
 	public List<String> listToReturn;
 	public boolean spyShouldThrowError = false;
 	public String errorMessage;
@@ -52,7 +52,7 @@ public class ChildComparerSpy implements ChildComparer {
 	}
 
 	private void possiblyAddErrorMessages() {
-		for (int i = 0; i < numberToReturn; i++) {
+		for (int i = 0; i < numberOfErrorsToReturn; i++) {
 			String errorMessage = "From spy: Child with number " + i + " is missing.";
 			listToReturn.add(errorMessage);
 		}

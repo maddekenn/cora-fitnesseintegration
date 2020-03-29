@@ -18,12 +18,57 @@
  */
 package se.uu.ub.cora.fitnesseintegration;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.StatusType;
+
+import se.uu.ub.cora.httphandler.HttpHandler;
+import se.uu.ub.cora.httphandler.HttpHandlerFactory;
+
 public class RecordHandlerImp implements RecordHandler {
 
+	protected StatusType statusType;
+	private HttpHandlerFactory httpHandlerFactory;
+
+	public RecordHandlerImp(HttpHandlerFactory httpHandlerFactory) {
+		this.httpHandlerFactory = httpHandlerFactory;
+	}
+
 	@Override
-	public String readRecordList(String url) {
-		// TODO Auto-generated method stub
-		return null;
+	public ReadResponse readRecordList(String url, String filterAsJson, String authToken)
+			throws UnsupportedEncodingException {
+		if (filterAsJson != null) {
+			url += "?filter=" + URLEncoder.encode(filterAsJson, StandardCharsets.UTF_8.name());
+		}
+		return getResponseTextOrErrorTextFromUrl(url, authToken);
+	}
+
+	private ReadResponse getResponseTextOrErrorTextFromUrl(String url, String authToken) {
+		HttpHandler httpHandler = createHttpHandlerWithAuthTokenAndUrl(url, authToken);
+		httpHandler.setRequestMethod("GET");
+
+		statusType = Response.Status.fromStatusCode(httpHandler.getResponseCode());
+		String responseText = responseIsOk() ? httpHandler.getResponseText()
+				: httpHandler.getErrorText();
+		return new ReadResponse(statusType, responseText);
+	}
+
+	protected boolean responseIsOk() {
+		return statusType.equals(Response.Status.OK);
+	}
+
+	private HttpHandler createHttpHandlerWithAuthTokenAndUrl(String url, String authToken) {
+		HttpHandler httpHandler = httpHandlerFactory.factor(url);
+		setAuthTokenInHeaderAsAuthTokenOrAdminAuthToken(httpHandler, authToken);
+		return httpHandler;
+	}
+
+	private void setAuthTokenInHeaderAsAuthTokenOrAdminAuthToken(HttpHandler httpHandler,
+			String authToken) {
+		httpHandler.setRequestProperty("authToken", authToken);
 	}
 
 }

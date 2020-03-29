@@ -18,20 +18,21 @@
  */
 package se.uu.ub.cora.fitnesseintegration;
 
-public class RecordHandlerSpy implements RecordHandler {
+import static org.testng.Assert.assertSame;
 
-	public boolean readRecordListWasCalled = false;
-	public String url;
-	public String jsonToReturn;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.StatusType;
 
-	@Override
-	public ReadResponse readRecordList(String url, String filter, String authToken) {
-		readRecordListWasCalled = true;
-		this.url = url;
+import org.testng.annotations.Test;
 
-		jsonToReturn = "some json returned from spy";
-		return new ReadResponse(new StatusTypeSpy(), jsonToReturn);
-		// return jsonToReturn;
+public class ReadResponseTest {
+
+	@Test
+	public void testReadResponse() {
+		StatusType statusType = Response.Status.fromStatusCode(200);
+		String responseText = "some response text";
+		ReadResponse readResponse = new ReadResponse(statusType, responseText);
+		assertSame(readResponse.statusType, statusType);
+		assertSame(readResponse.responseText, responseText);
 	}
-
 }

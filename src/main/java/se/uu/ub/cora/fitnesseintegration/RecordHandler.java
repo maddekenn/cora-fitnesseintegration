@@ -18,8 +18,11 @@
  */
 package se.uu.ub.cora.fitnesseintegration;
 
+import java.io.UnsupportedEncodingException;
+
 public interface RecordHandler {
 
-	String readRecordList(String url);
+	ReadResponse readRecordList(String url, String filter, String authToken)
+			throws UnsupportedEncodingException;
 
 }

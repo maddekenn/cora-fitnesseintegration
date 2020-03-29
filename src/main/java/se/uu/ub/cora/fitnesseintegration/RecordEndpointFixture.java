@@ -409,7 +409,7 @@ public class RecordEndpointFixture {
 
 		JsonToDataRecordConverter converter = JsonToDataRecordConverterImp
 				.usingConverterFactory(jsonToDataConverterFactory);
-		return (DataRecord) converter.toInstance(recordJsonObject);
+		return converter.toInstance(recordJsonObject);
 	}
 
 	public HttpHandlerFactory getHttpHandlerFactory() {
@@ -423,7 +423,7 @@ public class RecordEndpointFixture {
 	public String testReadCheckContain() {
 		String readJson = testReadRecord();
 		JsonObject jsonObject = jsonHandler.parseStringAsObject(readJson);
-		DataRecord record = (DataRecord) jsonToDataRecordConverter.toInstance(jsonObject);
+		DataRecord record = jsonToDataRecordConverter.toInstance(jsonObject);
 
 		JsonObject childrenObject = jsonHandler.parseStringAsObject(childrenToCompare);
 		return tryToCompareChildren(record, childrenObject);
@@ -480,7 +480,7 @@ public class RecordEndpointFixture {
 	public String testReadCheckContainWithValues() {
 		String readJson = testReadRecord();
 		JsonObject jsonObject = jsonHandler.parseStringAsObject(readJson);
-		DataRecord record = (DataRecord) jsonToDataRecordConverter.toInstance(jsonObject);
+		DataRecord record = jsonToDataRecordConverter.toInstance(jsonObject);
 
 		JsonObject childrenObject = jsonHandler.parseStringAsObject(childrenToCompare);
 		return tryToCompareChildrenWithCorrectValues(record, childrenObject);

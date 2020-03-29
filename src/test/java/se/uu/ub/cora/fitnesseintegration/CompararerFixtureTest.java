@@ -22,10 +22,14 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertSame;
 import static org.testng.Assert.assertTrue;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+
+import se.uu.ub.cora.clientdata.ClientDataGroup;
+import se.uu.ub.cora.clientdata.DataRecord;
 
 public class CompararerFixtureTest {
 
@@ -38,6 +42,9 @@ public class CompararerFixtureTest {
 	@BeforeMethod
 	public void setUp() {
 		SystemUrl.setUrl("http://localhost:8080/therest/");
+		DependencyProvider
+				.setChildComparerClassName("se.uu.ub.cora.fitnesseintegration.ChildComparerSpy");
+
 		jsonParser = new JsonParserSpy();
 		jsonHandler = JsonHandlerImp.usingJsonParser(jsonParser);
 		fixture = new ComparerFixture();
@@ -53,6 +60,8 @@ public class CompararerFixtureTest {
 	public void testInit() {
 		fixture = new ComparerFixture();
 		assertTrue(fixture.getRecordHandler() instanceof RecordHandlerImp);
+		assertTrue(fixture.getChildComparer() instanceof ChildComparerSpy);
+
 	}
 
 	@Test
@@ -71,41 +80,78 @@ public class CompararerFixtureTest {
 
 	}
 
-	// @Test
-	// public void testReadCheckContainResultOK() {
-	// jsonToDataConverter = new JsonToDataRecordConverterSpy();
-	// String childrenToLookFor = "{\"doesContain\":[{\"textVariable\":\"workoutName\"}]}";
-	// setUpFixtureForReadCheckContain(childrenToLookFor);
-	//
-	// assertEquals(fixture.testReadCheckContain(), "OK");
-	// }
+	@Test
+	public void testReadFromListCheckContainOK() {
+		// String children =
+		// "{\"children\":[{\"type\":\"atomic\",\"name\":\"workoutName\",\"value\":\"cirkelfys\"}]}";
+		fixture.setListIndexToCompareTo(0);
+		String result = fixture.testReadFromListCheckContain();
 
-	// private void setUpFixtureForReadCheckContain(String childrenToLookFor) {
-	// fixture.setJsonHandler(jsonHandler);
-	//
-	// fixture.setJsonToDataRecordConverter(jsonToDataConverter);
-	//
-	// fixture.setType("someCheckChildrenOkType");
-	// fixture.setId("someId");
-	// fixture.setChildren(childrenToLookFor);
-	// }
+		assertEquals(result, "OK");
+	}
 
 	@Test
-	public void testReadCheckContainRecordInList() {
-		fixture.testReadRecordListAndStoreRecords();
+	public void testReadFromListCheckContainComparesCorrectData() {
+		addRecordsToDataHolder();
+
+		String children = "{\"children\":[{\"type\":\"atomic\",\"name\":\"workoutName\",\"value\":\"cirkelfys\"}]}";
+		fixture.setChildren(children);
+		fixture.setListIndexToCompareTo(0);
+		fixture.testReadFromListCheckContain();
+
+		ChildComparerSpy comparerSpy = (ChildComparerSpy) fixture.getChildComparer();
+		assertEquals(jsonParser.jsonStringsSentToParser.get(0), children);
+
+		assertSame(comparerSpy.jsonValue, jsonParser.jsonObjectSpies.get(0));
+		ClientDataRecordSpy recordSpy = (ClientDataRecordSpy) DataHolder.getRecordList().get(0);
+		assertSame(comparerSpy.dataGroup, recordSpy.clientDataGroup);
+
 		fixture.setListIndexToCompareTo(1);
-		String result = fixture.testReadFromListCheckContain();
+		fixture.testReadFromListCheckContain();
+		ClientDataRecordSpy recordSpy2 = (ClientDataRecordSpy) DataHolder.getRecordList().get(1);
+		ClientDataGroup dataGroup = comparerSpy.dataGroup;
+		ClientDataGroup clientDataGroup = recordSpy2.clientDataGroup;
+		assertSame(dataGroup, clientDataGroup);
+
+	}
+
+	private void addRecordsToDataHolder() {
+		List<DataRecord> dataRecords = new ArrayList<>();
+		dataRecords.add(new ClientDataRecordSpy());
+		dataRecords.add(new ClientDataRecordSpy());
+		DataHolder.setRecordList(dataRecords);
+	}
+
+	@Test
+	public void testReadRecordListAndStoreRecordsInDataHolder() {
+		fixture.testReadRecordListAndStoreRecords();
 
 		String jsonListFromRecordHandler = recordHandler.jsonToReturn;
 		String jsonListSentToParser = jsonParser.jsonStringsSentToParser.get(0);
 		assertEquals(jsonListSentToParser, jsonListFromRecordHandler);
 
+		JsonObjectSpy listObjectFromSpy = assertObjectForKeyDataListIsExtracted();
+
+		JsonObjectSpy dataList = assertObjectForKeyDataIsExtracted(listObjectFromSpy);
+
+		assertAllRecordsInDataAreConverted(dataList);
+
+		assertConvertedRecordsAreAddedToRecordHolder();
+	}
+
+	private JsonObjectSpy assertObjectForKeyDataListIsExtracted() {
 		JsonObjectSpy listObjectFromSpy = jsonParser.jsonObjectSpies.get(0);
 		assertEquals(listObjectFromSpy.getValueKeys.get(0), "dataList");
+		return listObjectFromSpy;
+	}
 
+	private JsonObjectSpy assertObjectForKeyDataIsExtracted(JsonObjectSpy listObjectFromSpy) {
 		JsonObjectSpy dataList = listObjectFromSpy.getValueObjectsReturned.get(0);
 		assertEquals(dataList.getValueKeys.get(0), "data");
+		return dataList;
+	}
 
+	private void assertAllRecordsInDataAreConverted(JsonObjectSpy dataList) {
 		JsonArraySpy data = dataList.getValueArraysReturned.get(0);
 		IteratorSpy returnedIterator = data.returnedIterator;
 		assertTrue(returnedIterator.hasNextWasCalled);
@@ -113,9 +159,40 @@ public class CompararerFixtureTest {
 		List<JsonObjectSpy> objectsReturnedFromNext = returnedIterator.objectsReturnedFromNext;
 		assertSame(jsonToDataConverter.jsonObjects.get(0), objectsReturnedFromNext.get(0));
 		assertSame(jsonToDataConverter.jsonObjects.get(1), objectsReturnedFromNext.get(1));
+	}
 
-		// TODO: kolla att resultatet från convertern läggs i listan i dataHolder
+	private void assertConvertedRecordsAreAddedToRecordHolder() {
+		List<ClientDataRecordSpy> returnedSpies = jsonToDataConverter.returnedSpies;
+		assertSame(DataHolder.getRecordList().get(0), returnedSpies.get(0));
+		assertSame(DataHolder.getRecordList().get(1), returnedSpies.get(1));
+	}
 
+	@Test
+	public void testReadCheckContainWithValuesResultNotOK() {
+		addRecordsToDataHolder();
+		String childrenToLookFor = "{\"children\":[{\"type\":\"atomic\",\"name\":\"workoutName\",\"value\":\"cirkelfys\"}]}";
+		fixture.setListIndexToCompareTo(0);
+		fixture.setChildren(childrenToLookFor);
+
+		ChildComparerSpy childComparer = (ChildComparerSpy) fixture.getChildComparer();
+		childComparer.numberOfErrorsToReturn = 3;
+
+		assertEquals(fixture.testReadFromListCheckContain(),
+				"From spy: Child with number 0 is missing. "
+						+ "From spy: Child with number 1 is missing. "
+						+ "From spy: Child with number 2 is missing.");
+	}
+
+	@Test
+	public void testReadCheckContainWithValuesComparerThrowsError() {
+		addRecordsToDataHolder();
+		String childrenToLookFor = "{\"children\":[{\"type\":\"atomic\",\"name\":\"workoutName\",\"value\":\"cirkelfys\"}]}";
+		fixture.setListIndexToCompareTo(0);
+		fixture.setChildren(childrenToLookFor);
+		ChildComparerSpy childComparer = (ChildComparerSpy) fixture.getChildComparer();
+		childComparer.spyShouldThrowError = true;
+
+		assertEquals(fixture.testReadFromListCheckContain(), childComparer.errorMessage);
 	}
 
 }

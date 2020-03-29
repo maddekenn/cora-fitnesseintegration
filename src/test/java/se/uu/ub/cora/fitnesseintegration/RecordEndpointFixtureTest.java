@@ -66,7 +66,7 @@ public class RecordEndpointFixtureTest {
 		assertTrue(
 				fixture.getJsonToDataConverterFactory() instanceof JsonToDataConverterFactorySpy);
 		assertTrue(fixture.getHttpHandlerFactory() instanceof HttpHandlerFactorySpy);
-		assertTrue(fixture.getChildComparer() instanceof ChildComparer);
+		assertTrue(fixture.getChildComparer() instanceof ChildComparerSpy);
 		assertTrue(fixture.getJsonToDataRecordConverter() instanceof JsonToDataRecordConverterImp);
 		assertTrue(fixture.getJsonToDataRecordConverter() instanceof JsonToDataRecordConverterImp);
 		assertTrue(fixture.getJsonHandler() instanceof JsonHandlerImp);
@@ -501,7 +501,7 @@ public class RecordEndpointFixtureTest {
 		setUpFixtureForReadCheckContain(childrenToLookFor);
 
 		ChildComparerSpy childComparer = (ChildComparerSpy) fixture.getChildComparer();
-		childComparer.numberToReturn = 3;
+		childComparer.numberOfErrorsToReturn = 3;
 
 		assertEquals(fixture.testReadCheckContain(),
 				"From spy: Child with number 0 is missing. "
@@ -553,7 +553,7 @@ public class RecordEndpointFixtureTest {
 		setUpFixtureForReadCheckContain(childrenToLookFor);
 
 		ChildComparerSpy childComparer = (ChildComparerSpy) fixture.getChildComparer();
-		childComparer.numberToReturn = 3;
+		childComparer.numberOfErrorsToReturn = 3;
 
 		assertEquals(fixture.testReadCheckContainWithValues(),
 				"From spy: Child with number 0 is missing. "
