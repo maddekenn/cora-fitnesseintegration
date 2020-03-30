@@ -46,6 +46,7 @@ public class ComparerFixture {
 	private HttpHandlerFactory httpHandlerFactory;
 	private String authToken;
 	private String listFilter;
+	private String id;
 
 	public ComparerFixture() {
 		httpHandlerFactory = DependencyProvider.getHttpHandlerFactory();
@@ -64,6 +65,20 @@ public class ComparerFixture {
 		DataHolder.setRecordList(convertedRecords);
 
 	}
+
+	public void testReadRecordAndStoreJson() {
+		String baseUrl = SystemUrl.getUrl() + "rest/record/";
+		ReadResponse readResponse = recordHandler.readRecord(baseUrl + type + "/" + id, "");
+		JsonObject recordJsonObject = jsonHandler.parseStringAsObject(readResponse.responseText);
+		DataRecord record = jsonToDataRecordConverter.toInstance(recordJsonObject);
+	}
+
+	// public void testReadRecordAndStoreJson() {
+	// String responseText = testReadRecord();
+	// DataRecord clientDataRecord = convertJsonToClientDataRecord(responseText);
+	//
+	// DataHolder.setRecord(clientDataRecord);
+	// }
 
 	private List<DataRecord> convertToRecords() {
 		JsonArray data = extractListOfRecords();
@@ -144,6 +159,11 @@ public class ComparerFixture {
 		return errorMessages.isEmpty() ? "OK" : joinErrorMessages(errorMessages);
 	}
 
+	public void testReadRecordAndStoreRecord() {
+		// TODO Auto-generated method stub
+
+	}
+
 	private int getListIndexToCompareTo() {
 		return indexToCompareTo;
 	}
@@ -203,5 +223,20 @@ public class ComparerFixture {
 		// needed for test
 		return jsonToDataRecordConverter;
 	}
+
+	public void setId(String id) {
+		this.id = id;
+
+	}
+
+	// public String testReadFromListCheckContainWithValues() {
+	// try {
+	// ClientDataGroup clientDataGroup = getDataGroupFromRecordHolderUsingIndex();
+	// return compareChildrenWithValuesUsingDataGroup(clientDataGroup);
+	// } catch (JsonParseException exception) {
+	// return exception.getMessage();
+	// }
+	//
+	// }
 
 }

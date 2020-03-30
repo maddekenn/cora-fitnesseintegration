@@ -25,6 +25,7 @@ public class RecordHandlerSpy implements RecordHandler {
 	public String filter;
 	public String authToken;
 	public String jsonToReturn;
+	public boolean readRecordWasCalled = false;
 
 	@Override
 	public ReadResponse readRecordList(String url, String filter, String authToken) {
@@ -35,7 +36,15 @@ public class RecordHandlerSpy implements RecordHandler {
 
 		jsonToReturn = "some json returned from spy";
 		return new ReadResponse(new StatusTypeSpy(), jsonToReturn);
-		// return jsonToReturn;
+	}
+
+	@Override
+	public ReadResponse readRecord(String url, String authToken) {
+		this.url = url;
+		this.authToken = authToken;
+		readRecordWasCalled = true;
+		jsonToReturn = "some json returned from read record in spy";
+		return new ReadResponse(new StatusTypeSpy(), jsonToReturn);
 	}
 
 }

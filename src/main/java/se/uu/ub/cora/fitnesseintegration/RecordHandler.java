@@ -25,4 +25,6 @@ public interface RecordHandler {
 	ReadResponse readRecordList(String url, String filter, String authToken)
 			throws UnsupportedEncodingException;
 
+	ReadResponse readRecord(String url, String authToken);
+
 }

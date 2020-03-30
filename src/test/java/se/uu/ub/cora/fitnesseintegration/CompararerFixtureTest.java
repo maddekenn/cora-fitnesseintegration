@@ -211,7 +211,7 @@ public class CompararerFixtureTest {
 	}
 
 	@Test
-	public void testReadCheckContainWithValuesComparerThrowsError() {
+	public void testReadFromListCheckContainWithValuesComparerThrowsError() {
 		addRecordsToDataHolder();
 		String childrenToLookFor = "{\"children\":[{\"type\":\"atomic\",\"name\":\"workoutName\",\"value\":\"cirkelfys\"}]}";
 		fixture.setListIndexToCompareTo(0);
@@ -224,6 +224,7 @@ public class CompararerFixtureTest {
 
 	@Test
 	public void testReadFromListCheckContainOK() {
+		addRecordsToDataHolder();
 		fixture.setListIndexToCompareTo(0);
 		String result = fixture.testReadFromListCheckContain();
 
@@ -247,7 +248,7 @@ public class CompararerFixtureTest {
 	}
 
 	@Test
-	public void testReadFromListCheckContainComparesCorrectData() {
+	public void testReadListCheckContainComparesCorrectData() {
 		addRecordsToDataHolder();
 
 		String childrenToLookFor = "{\"children\":[{\"name\":\"instructorId\"},{\"name\":\"popularity\"}]}";
@@ -272,7 +273,7 @@ public class CompararerFixtureTest {
 	}
 
 	@Test
-	public void testReadCheckContainComparerThrowsError() {
+	public void testReadListCheckContainComparerThrowsError() {
 		addRecordsToDataHolder();
 		String childrenToLookFor = "{\"children\":[{\"name\":\"instructorId\"},{\"name\":\"popularity\"}]}";
 		fixture.setListIndexToCompareTo(0);
@@ -282,4 +283,33 @@ public class CompararerFixtureTest {
 
 		assertEquals(fixture.testReadFromListCheckContain(), childComparer.errorMessage);
 	}
+
+	@Test
+	public void testReadRecordAndStoreJson() throws UnsupportedEncodingException {
+		String authToken = "someAuthToken";
+		fixture.setAuthToken(authToken);
+		fixture.setId("someId");
+		fixture.testReadRecordAndStoreJson();
+		assertTrue(recordHandler.readRecordWasCalled);
+
+		String expectedUrl = SystemUrl.getUrl() + "rest/record/someRecordType/someId";
+		assertEquals(recordHandler.url, expectedUrl);
+
+		String jsonListFromRecordHandler = recordHandler.jsonToReturn;
+		String jsonListSentToParser = jsonParser.jsonStringsSentToParser.get(0);
+		assertEquals(jsonListSentToParser, jsonListFromRecordHandler);
+		assertSame(jsonToDataConverter.jsonObjects.get(0), jsonParser.jsonObjectSpies.get(0));
+		// TODO:chec is added to dataholder
+		// assertEquals(DataHolder.getRecord(), recordHandler.jsonToReturn);
+		// assertEquals(recordHandler.authToken, authToken);
+		// assertNull(recordHandler.filter);
+	}
+
+	// @Test
+	// public void testReadCheckContainWithValuesOK() {
+	// fixture.setListIndexToCompareTo(0);
+	// String result = fixture.testReadFromListCheckContainWithValues();
+	//
+	// assertEquals(result, "OK");
+	// }
 }

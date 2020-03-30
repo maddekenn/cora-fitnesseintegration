@@ -76,4 +76,15 @@ public class RecordHandlerImp implements RecordHandler {
 		return httpHandlerFactory;
 	}
 
+	@Override
+	public ReadResponse readRecord(String url, String authToken) {
+		HttpHandler httpHandler = createHttpHandlerWithAuthTokenAndUrl(url, authToken);
+		httpHandler.setRequestMethod("GET");
+
+		statusType = Response.Status.fromStatusCode(httpHandler.getResponseCode());
+		String responseText = responseIsOk() ? httpHandler.getResponseText()
+				: httpHandler.getErrorText();
+		return new ReadResponse(Response.Status.OK, responseText);
+	}
+
 }

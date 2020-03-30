@@ -19,6 +19,7 @@
 package se.uu.ub.cora.fitnesseintegration;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
 
 import java.io.UnsupportedEncodingException;
@@ -40,6 +41,36 @@ public class RecordHandlerTest {
 		httpHandlerFactorySpy = new HttpHandlerFactorySpy();
 		recordHandler = new RecordHandlerImp(httpHandlerFactorySpy);
 
+	}
+
+	@Test
+	public void testReadRecordHttpHandlerSetUpCorrectly() throws UnsupportedEncodingException {
+		recordHandler.readRecord(url + "/someId", authToken);
+		assertEquals(httpHandlerFactorySpy.httpHandlerSpy.requestMetod, "GET");
+
+		assertEquals(httpHandlerFactorySpy.urlString,
+				"http://localhost:8080/therest/rest/record/someType/someId");
+		HttpHandlerSpy httpHandlerSpy = httpHandlerFactorySpy.httpHandlerSpy;
+		assertEquals(httpHandlerSpy.requestProperties.get("authToken"), "someAuthToken");
+
+	}
+
+	@Test
+	public void testReadRecordOk() {
+		ReadResponse readResponse = recordHandler.readRecord(url, authToken);
+		assertTrue(readResponse.statusType.getStatusCode() == 200);
+		HttpHandlerSpy httpHandlerSpy = httpHandlerFactorySpy.httpHandlerSpy;
+		assertEquals(readResponse.responseText, httpHandlerSpy.responseText);
+	}
+
+	@Test
+	public void testReadRecordNotOk() throws UnsupportedEncodingException {
+		httpHandlerFactorySpy.changeFactoryToFactorInvalidHttpHandlers();
+		ReadResponse readResponse = recordHandler.readRecord(url, authToken);
+
+		HttpHandlerInvalidSpy httpHandlerSpy = httpHandlerFactorySpy.httpHandlerInvalidSpy;
+		assertNotNull(readResponse.responseText);
+		assertEquals(readResponse.responseText, httpHandlerSpy.returnedErrorText);
 	}
 
 	@Test
