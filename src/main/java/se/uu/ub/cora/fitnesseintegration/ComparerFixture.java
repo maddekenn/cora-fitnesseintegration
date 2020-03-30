@@ -26,6 +26,7 @@ import java.util.StringJoiner;
 import se.uu.ub.cora.clientdata.ClientDataGroup;
 import se.uu.ub.cora.clientdata.DataRecord;
 import se.uu.ub.cora.clientdata.converter.jsontojava.JsonToDataRecordConverter;
+import se.uu.ub.cora.httphandler.HttpHandlerFactory;
 import se.uu.ub.cora.json.parser.JsonArray;
 import se.uu.ub.cora.json.parser.JsonObject;
 import se.uu.ub.cora.json.parser.JsonParseException;
@@ -40,21 +41,20 @@ public class ComparerFixture {
 	private ChildComparer childComparer;
 	private String childrenToCompare;
 	private int indexToCompareTo;
+	private HttpHandlerFactory httpHandlerFactory;
+	private String authToken;
+	private String listFilter;
 
 	public ComparerFixture() {
-		// TODO: fixa httphandler
-		recordHandler = new RecordHandlerImp(null);
+		httpHandlerFactory = DependencyProvider.getHttpHandlerFactory();
+		recordHandler = new RecordHandlerImp(httpHandlerFactory);
 		childComparer = DependencyProvider.getChildComparer();
 	}
 
-	public void testReadRecordListAndStoreRecords() {
+	public void testReadRecordListAndStoreRecords() throws UnsupportedEncodingException {
 		String baseUrl = SystemUrl.getUrl() + "rest/record/";
-		try {
-			storedListAsJson = recordHandler.readRecordList(baseUrl + type, "", "").responseText;
-		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		storedListAsJson = recordHandler.readRecordList(baseUrl + type, listFilter,
+				authToken).responseText;
 
 		List<DataRecord> convertedRecords = convertToRecords();
 		DataHolder.setRecordList(convertedRecords);
@@ -73,8 +73,7 @@ public class ComparerFixture {
 	private JsonArray extractListOfRecords() {
 		JsonObject list = jsonHandler.parseStringAsObject(storedListAsJson);
 		JsonObject dataList = (JsonObject) list.getValue("dataList");
-		JsonArray data = (JsonArray) dataList.getValue("data");
-		return data;
+		return (JsonArray) dataList.getValue("data");
 	}
 
 	private void convertAndAddRecord(JsonArray data, List<DataRecord> convertedRecords) {
@@ -158,5 +157,18 @@ public class ComparerFixture {
 	public ChildComparer getChildComparer() {
 		// needed for test
 		return childComparer;
+	}
+
+	public HttpHandlerFactory getHttpHandlerFactory() {
+		// needed for test
+		return httpHandlerFactory;
+	}
+
+	public void setAuthToken(String authToken) {
+		this.authToken = authToken;
+	}
+
+	public void setListFilter(String listFilter) {
+		this.listFilter = listFilter;
 	}
 }

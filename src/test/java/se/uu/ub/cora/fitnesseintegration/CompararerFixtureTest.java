@@ -19,9 +19,11 @@
 package se.uu.ub.cora.fitnesseintegration;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNull;
 import static org.testng.Assert.assertSame;
 import static org.testng.Assert.assertTrue;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,75 +46,63 @@ public class CompararerFixtureTest {
 		SystemUrl.setUrl("http://localhost:8080/therest/");
 		DependencyProvider
 				.setChildComparerClassName("se.uu.ub.cora.fitnesseintegration.ChildComparerSpy");
+		DependencyProvider.setHttpHandlerFactoryClassName(
+				"se.uu.ub.cora.fitnesseintegration.HttpHandlerFactorySpy");
 
+		fixture = new ComparerFixture();
+		setUpFixture();
+	}
+
+	private void setUpFixture() {
+		recordHandler = new RecordHandlerSpy();
 		jsonParser = new JsonParserSpy();
 		jsonHandler = JsonHandlerImp.usingJsonParser(jsonParser);
-		fixture = new ComparerFixture();
+		jsonToDataConverter = new JsonToDataRecordConverterSpy();
+
 		fixture.setType("someRecordType");
-		recordHandler = new RecordHandlerSpy();
 		fixture.setRecordHandler(recordHandler);
 		fixture.setJsonHandler(jsonHandler);
-		jsonToDataConverter = new JsonToDataRecordConverterSpy();
 		fixture.setJsonToDataRecordConverter(jsonToDataConverter);
 	}
 
 	@Test
 	public void testInit() {
 		fixture = new ComparerFixture();
-		assertTrue(fixture.getRecordHandler() instanceof RecordHandlerImp);
 		assertTrue(fixture.getChildComparer() instanceof ChildComparerSpy);
+		assertTrue(fixture.getHttpHandlerFactory() instanceof HttpHandlerFactorySpy);
 
+		RecordHandlerImp recordHandler = (RecordHandlerImp) fixture.getRecordHandler();
+		assertSame(recordHandler.getHttpHandlerFactory(), fixture.getHttpHandlerFactory());
 	}
 
 	@Test
-	public void testReadRecordListAndStoreRecords() {
+	public void testReadRecordListAndStoreRecordsNoFilter() throws UnsupportedEncodingException {
+		String authToken = "someAuthToken";
+		fixture.setAuthToken(authToken);
 		fixture.testReadRecordListAndStoreRecords();
 		assertTrue(recordHandler.readRecordListWasCalled);
 
 		String expectedUrl = SystemUrl.getUrl() + "rest/record/someRecordType";
 		assertEquals(recordHandler.url, expectedUrl);
 		assertEquals(fixture.getStoredListAsJson(), recordHandler.jsonToReturn);
+		assertEquals(recordHandler.authToken, authToken);
+		assertNull(recordHandler.filter);
 	}
 
 	@Test
-	public void testListAsJsonIsConvertedAndStoredInDataHolder() {
+	public void testReadRecordListAndStoreRecordsWithFilter() throws UnsupportedEncodingException {
+		String authToken = "someAuthToken";
+		String listFilter = "someFilter";
+		fixture.setAuthToken(authToken);
+		fixture.setListFilter(listFilter);
 		fixture.testReadRecordListAndStoreRecords();
+		assertTrue(recordHandler.readRecordListWasCalled);
 
-	}
-
-	@Test
-	public void testReadFromListCheckContainOK() {
-		// String children =
-		// "{\"children\":[{\"type\":\"atomic\",\"name\":\"workoutName\",\"value\":\"cirkelfys\"}]}";
-		fixture.setListIndexToCompareTo(0);
-		String result = fixture.testReadFromListCheckContain();
-
-		assertEquals(result, "OK");
-	}
-
-	@Test
-	public void testReadFromListCheckContainComparesCorrectData() {
-		addRecordsToDataHolder();
-
-		String children = "{\"children\":[{\"type\":\"atomic\",\"name\":\"workoutName\",\"value\":\"cirkelfys\"}]}";
-		fixture.setChildren(children);
-		fixture.setListIndexToCompareTo(0);
-		fixture.testReadFromListCheckContain();
-
-		ChildComparerSpy comparerSpy = (ChildComparerSpy) fixture.getChildComparer();
-		assertEquals(jsonParser.jsonStringsSentToParser.get(0), children);
-
-		assertSame(comparerSpy.jsonValue, jsonParser.jsonObjectSpies.get(0));
-		ClientDataRecordSpy recordSpy = (ClientDataRecordSpy) DataHolder.getRecordList().get(0);
-		assertSame(comparerSpy.dataGroup, recordSpy.clientDataGroup);
-
-		fixture.setListIndexToCompareTo(1);
-		fixture.testReadFromListCheckContain();
-		ClientDataRecordSpy recordSpy2 = (ClientDataRecordSpy) DataHolder.getRecordList().get(1);
-		ClientDataGroup dataGroup = comparerSpy.dataGroup;
-		ClientDataGroup clientDataGroup = recordSpy2.clientDataGroup;
-		assertSame(dataGroup, clientDataGroup);
-
+		String expectedUrl = SystemUrl.getUrl() + "rest/record/someRecordType";
+		assertEquals(recordHandler.url, expectedUrl);
+		assertEquals(fixture.getStoredListAsJson(), recordHandler.jsonToReturn);
+		assertEquals(recordHandler.authToken, authToken);
+		assertEquals(recordHandler.filter, listFilter);
 	}
 
 	private void addRecordsToDataHolder() {
@@ -123,7 +113,8 @@ public class CompararerFixtureTest {
 	}
 
 	@Test
-	public void testReadRecordListAndStoreRecordsInDataHolder() {
+	public void testReadRecordListAndStoreRecordsInDataHolder()
+			throws UnsupportedEncodingException {
 		fixture.testReadRecordListAndStoreRecords();
 
 		String jsonListFromRecordHandler = recordHandler.jsonToReturn;
@@ -168,7 +159,15 @@ public class CompararerFixtureTest {
 	}
 
 	@Test
-	public void testReadCheckContainWithValuesResultNotOK() {
+	public void testReadFromListCheckContainOK() {
+		fixture.setListIndexToCompareTo(0);
+		String result = fixture.testReadFromListCheckContain();
+
+		assertEquals(result, "OK");
+	}
+
+	@Test
+	public void testReadFromListCheckContainWithValuesResultNotOK() {
 		addRecordsToDataHolder();
 		String childrenToLookFor = "{\"children\":[{\"type\":\"atomic\",\"name\":\"workoutName\",\"value\":\"cirkelfys\"}]}";
 		fixture.setListIndexToCompareTo(0);
@@ -181,6 +180,31 @@ public class CompararerFixtureTest {
 				"From spy: Child with number 0 is missing. "
 						+ "From spy: Child with number 1 is missing. "
 						+ "From spy: Child with number 2 is missing.");
+	}
+
+	@Test
+	public void testReadFromListCheckContainComparesCorrectData() {
+		addRecordsToDataHolder();
+
+		String children = "{\"children\":[{\"type\":\"atomic\",\"name\":\"workoutName\",\"value\":\"cirkelfys\"}]}";
+		fixture.setChildren(children);
+		fixture.setListIndexToCompareTo(0);
+		fixture.testReadFromListCheckContain();
+
+		ChildComparerSpy comparerSpy = (ChildComparerSpy) fixture.getChildComparer();
+		assertEquals(jsonParser.jsonStringsSentToParser.get(0), children);
+
+		assertSame(comparerSpy.jsonValue, jsonParser.jsonObjectSpies.get(0));
+		ClientDataRecordSpy recordSpy = (ClientDataRecordSpy) DataHolder.getRecordList().get(0);
+		assertSame(comparerSpy.dataGroup, recordSpy.clientDataGroup);
+
+		fixture.setListIndexToCompareTo(1);
+		fixture.testReadFromListCheckContain();
+		ClientDataRecordSpy recordSpy2 = (ClientDataRecordSpy) DataHolder.getRecordList().get(1);
+		ClientDataGroup dataGroup = comparerSpy.dataGroup;
+		ClientDataGroup clientDataGroup = recordSpy2.clientDataGroup;
+		assertSame(dataGroup, clientDataGroup);
+
 	}
 
 	@Test

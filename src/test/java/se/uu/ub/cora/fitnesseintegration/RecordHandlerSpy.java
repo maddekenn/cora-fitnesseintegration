@@ -22,12 +22,16 @@ public class RecordHandlerSpy implements RecordHandler {
 
 	public boolean readRecordListWasCalled = false;
 	public String url;
+	public String filter;
+	public String authToken;
 	public String jsonToReturn;
 
 	@Override
 	public ReadResponse readRecordList(String url, String filter, String authToken) {
 		readRecordListWasCalled = true;
 		this.url = url;
+		this.filter = filter;
+		this.authToken = authToken;
 
 		jsonToReturn = "some json returned from spy";
 		return new ReadResponse(new StatusTypeSpy(), jsonToReturn);

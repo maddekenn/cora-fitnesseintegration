@@ -71,4 +71,9 @@ public class RecordHandlerImp implements RecordHandler {
 		httpHandler.setRequestProperty("authToken", authToken);
 	}
 
+	public HttpHandlerFactory getHttpHandlerFactory() {
+		// needed for test
+		return httpHandlerFactory;
+	}
+
 }
