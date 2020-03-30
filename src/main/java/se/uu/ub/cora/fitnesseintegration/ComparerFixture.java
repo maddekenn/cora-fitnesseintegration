@@ -20,6 +20,7 @@ package se.uu.ub.cora.fitnesseintegration;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.StringJoiner;
 
@@ -30,6 +31,7 @@ import se.uu.ub.cora.httphandler.HttpHandlerFactory;
 import se.uu.ub.cora.json.parser.JsonArray;
 import se.uu.ub.cora.json.parser.JsonObject;
 import se.uu.ub.cora.json.parser.JsonParseException;
+import se.uu.ub.cora.json.parser.JsonValue;
 
 public class ComparerFixture {
 
@@ -49,6 +51,8 @@ public class ComparerFixture {
 		httpHandlerFactory = DependencyProvider.getHttpHandlerFactory();
 		recordHandler = new RecordHandlerImp(httpHandlerFactory);
 		childComparer = DependencyProvider.getChildComparer();
+		jsonHandler = DependencyProvider.getJsonHandler();
+		jsonToDataRecordConverter = DependencyProvider.getJsonToDataRecordConverter();
 	}
 
 	public void testReadRecordListAndStoreRecords() throws UnsupportedEncodingException {
@@ -64,8 +68,10 @@ public class ComparerFixture {
 	private List<DataRecord> convertToRecords() {
 		JsonArray data = extractListOfRecords();
 		List<DataRecord> convertedRecords = new ArrayList<>();
-		while (data.iterator().hasNext()) {
-			convertAndAddRecord(data, convertedRecords);
+		Iterator<JsonValue> iterator = data.iterator();
+		while (iterator.hasNext()) {
+			JsonObject record = (JsonObject) iterator.next();
+			convertAndAddRecord(record, convertedRecords);
 		}
 		return convertedRecords;
 	}
@@ -76,9 +82,9 @@ public class ComparerFixture {
 		return (JsonArray) dataList.getValue("data");
 	}
 
-	private void convertAndAddRecord(JsonArray data, List<DataRecord> convertedRecords) {
-		JsonObject next = (JsonObject) data.iterator().next();
-		DataRecord record = jsonToDataRecordConverter.toInstance(next);
+	private void convertAndAddRecord(JsonObject recordJsonObject,
+			List<DataRecord> convertedRecords) {
+		DataRecord record = jsonToDataRecordConverter.toInstance(recordJsonObject);
 		convertedRecords.add(record);
 	}
 
@@ -107,19 +113,35 @@ public class ComparerFixture {
 		} catch (JsonParseException exception) {
 			return exception.getMessage();
 		}
-
 	}
 
 	private String compareChildrenUsingDataGroup(ClientDataGroup clientDataGroup) {
 		JsonObject childrenObject = jsonHandler.parseStringAsObject(childrenToCompare);
-		List<String> errorMessages = childComparer
-				.checkDataGroupContainsChildrenWithCorrectValues(clientDataGroup, childrenObject);
+		List<String> errorMessages = childComparer.checkDataGroupContainsChildren(clientDataGroup,
+				childrenObject);
 		return errorMessages.isEmpty() ? "OK" : joinErrorMessages(errorMessages);
+	}
+
+	public String testReadFromListCheckContainWithValues() {
+		try {
+			ClientDataGroup clientDataGroup = getDataGroupFromRecordHolderUsingIndex();
+			return compareChildrenWithValuesUsingDataGroup(clientDataGroup);
+		} catch (JsonParseException exception) {
+			return exception.getMessage();
+		}
+
 	}
 
 	private ClientDataGroup getDataGroupFromRecordHolderUsingIndex() {
 		int index = getListIndexToCompareTo();
 		return DataHolder.getRecordList().get(index).getClientDataGroup();
+	}
+
+	private String compareChildrenWithValuesUsingDataGroup(ClientDataGroup clientDataGroup) {
+		JsonObject childrenObject = jsonHandler.parseStringAsObject(childrenToCompare);
+		List<String> errorMessages = childComparer
+				.checkDataGroupContainsChildrenWithCorrectValues(clientDataGroup, childrenObject);
+		return errorMessages.isEmpty() ? "OK" : joinErrorMessages(errorMessages);
 	}
 
 	private int getListIndexToCompareTo() {
@@ -171,4 +193,15 @@ public class ComparerFixture {
 	public void setListFilter(String listFilter) {
 		this.listFilter = listFilter;
 	}
+
+	public JsonHandler getJsonHandler() {
+		// needed for test
+		return jsonHandler;
+	}
+
+	public JsonToDataRecordConverter getJsonToDataRecordConverter() {
+		// needed for test
+		return jsonToDataRecordConverter;
+	}
+
 }

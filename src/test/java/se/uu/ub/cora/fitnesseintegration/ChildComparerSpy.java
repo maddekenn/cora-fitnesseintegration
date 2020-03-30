@@ -47,13 +47,13 @@ public class ChildComparerSpy implements ChildComparer {
 		this.jsonValue = jsonValue;
 		possiblyThrowError();
 		listToReturn = new ArrayList<>();
-		possiblyAddErrorMessages();
+		possiblyAddErrorMessages("is missing.");
 		return listToReturn;
 	}
 
-	private void possiblyAddErrorMessages() {
+	private void possiblyAddErrorMessages(String extraMessage) {
 		for (int i = 0; i < numberOfErrorsToReturn; i++) {
-			String errorMessage = "From spy: Child with number " + i + " is missing.";
+			String errorMessage = "From spy: Child with number " + i + " " + extraMessage;
 			listToReturn.add(errorMessage);
 		}
 	}
@@ -72,7 +72,7 @@ public class ChildComparerSpy implements ChildComparer {
 		this.jsonValue = jsonValue;
 		possiblyThrowError();
 		listToReturn = new ArrayList<>();
-		possiblyAddErrorMessages();
+		possiblyAddErrorMessages("has incorrect value.");
 		return listToReturn;
 	}
 
