@@ -56,6 +56,14 @@ public class ComparerFixture {
 		jsonToDataRecordConverter = DependencyProvider.getJsonToDataRecordConverter();
 	}
 
+	public void testReadAndStoreRecord() {
+		String baseUrl = SystemUrl.getUrl() + "rest/record/";
+		ReadResponse readResponse = recordHandler.readRecord(baseUrl + type + "/" + id, authToken);
+		JsonObject recordJsonObject = jsonHandler.parseStringAsObject(readResponse.responseText);
+		DataRecord record = jsonToDataRecordConverter.toInstance(recordJsonObject);
+		DataHolder.setRecord(record);
+	}
+
 	public void testReadRecordListAndStoreRecords() throws UnsupportedEncodingException {
 		String baseUrl = SystemUrl.getUrl() + "rest/record/";
 		storedListAsJson = recordHandler.readRecordList(baseUrl + type, listFilter,
@@ -63,22 +71,7 @@ public class ComparerFixture {
 
 		List<DataRecord> convertedRecords = convertToRecords();
 		DataHolder.setRecordList(convertedRecords);
-
 	}
-
-	public void testReadRecordAndStoreJson() {
-		String baseUrl = SystemUrl.getUrl() + "rest/record/";
-		ReadResponse readResponse = recordHandler.readRecord(baseUrl + type + "/" + id, "");
-		JsonObject recordJsonObject = jsonHandler.parseStringAsObject(readResponse.responseText);
-		DataRecord record = jsonToDataRecordConverter.toInstance(recordJsonObject);
-	}
-
-	// public void testReadRecordAndStoreJson() {
-	// String responseText = testReadRecord();
-	// DataRecord clientDataRecord = convertJsonToClientDataRecord(responseText);
-	//
-	// DataHolder.setRecord(clientDataRecord);
-	// }
 
 	private List<DataRecord> convertToRecords() {
 		JsonArray data = extractListOfRecords();
@@ -103,28 +96,10 @@ public class ComparerFixture {
 		convertedRecords.add(record);
 	}
 
-	public void setType(String type) {
-		this.type = type;
-
-	}
-
-	public RecordHandler getRecordHandler() {
-		return recordHandler;
-	}
-
-	void setRecordHandler(RecordHandler recordHandler) {
-		this.recordHandler = recordHandler;
-
-	}
-
-	public String getStoredListAsJson() {
-		return storedListAsJson;
-	}
-
-	public String testReadFromListCheckContain() {
+	public String testCheckContain() {
 		try {
-			ClientDataGroup clientDataGroup = getDataGroupFromRecordHolderUsingIndex();
-			return compareChildrenUsingDataGroup(clientDataGroup);
+			ClientDataGroup readDataGroup = DataHolder.getRecord().getClientDataGroup();
+			return compareChildrenUsingDataGroup(readDataGroup);
 		} catch (JsonParseException exception) {
 			return exception.getMessage();
 		}
@@ -137,19 +112,21 @@ public class ComparerFixture {
 		return errorMessages.isEmpty() ? "OK" : joinErrorMessages(errorMessages);
 	}
 
-	public String testReadFromListCheckContainWithValues() {
+	private String joinErrorMessages(List<String> errorMessages) {
+		StringJoiner compareError = new StringJoiner(" ");
+		for (String errorMessage : errorMessages) {
+			compareError.add(errorMessage);
+		}
+		return compareError.toString();
+	}
+
+	public String testCheckContainWithValues() {
 		try {
-			ClientDataGroup clientDataGroup = getDataGroupFromRecordHolderUsingIndex();
-			return compareChildrenWithValuesUsingDataGroup(clientDataGroup);
+			ClientDataGroup readDataGroup = DataHolder.getRecord().getClientDataGroup();
+			return compareChildrenWithValuesUsingDataGroup(readDataGroup);
 		} catch (JsonParseException exception) {
 			return exception.getMessage();
 		}
-
-	}
-
-	private ClientDataGroup getDataGroupFromRecordHolderUsingIndex() {
-		int index = getListIndexToCompareTo();
-		return DataHolder.getRecordList().get(index).getClientDataGroup();
 	}
 
 	private String compareChildrenWithValuesUsingDataGroup(ClientDataGroup clientDataGroup) {
@@ -159,21 +136,31 @@ public class ComparerFixture {
 		return errorMessages.isEmpty() ? "OK" : joinErrorMessages(errorMessages);
 	}
 
-	public void testReadRecordAndStoreRecord() {
-		// TODO Auto-generated method stub
+	public String testReadFromListCheckContain() {
+		try {
+			ClientDataGroup clientDataGroup = getDataGroupFromRecordHolderUsingIndex();
+			return compareChildrenUsingDataGroup(clientDataGroup);
+		} catch (JsonParseException exception) {
+			return exception.getMessage();
+		}
+	}
 
+	private ClientDataGroup getDataGroupFromRecordHolderUsingIndex() {
+		int index = getListIndexToCompareTo();
+		return DataHolder.getRecordList().get(index).getClientDataGroup();
+	}
+
+	public String testReadFromListCheckContainWithValues() {
+		try {
+			ClientDataGroup clientDataGroup = getDataGroupFromRecordHolderUsingIndex();
+			return compareChildrenWithValuesUsingDataGroup(clientDataGroup);
+		} catch (JsonParseException exception) {
+			return exception.getMessage();
+		}
 	}
 
 	private int getListIndexToCompareTo() {
 		return indexToCompareTo;
-	}
-
-	private String joinErrorMessages(List<String> errorMessages) {
-		StringJoiner compareError = new StringJoiner(" ");
-		for (String errorMessage : errorMessages) {
-			compareError.add(errorMessage);
-		}
-		return compareError.toString();
 	}
 
 	public void setListIndexToCompareTo(int index) {
@@ -229,14 +216,22 @@ public class ComparerFixture {
 
 	}
 
-	// public String testReadFromListCheckContainWithValues() {
-	// try {
-	// ClientDataGroup clientDataGroup = getDataGroupFromRecordHolderUsingIndex();
-	// return compareChildrenWithValuesUsingDataGroup(clientDataGroup);
-	// } catch (JsonParseException exception) {
-	// return exception.getMessage();
-	// }
-	//
-	// }
+	public void setType(String type) {
+		this.type = type;
+
+	}
+
+	public RecordHandler getRecordHandler() {
+		return recordHandler;
+	}
+
+	void setRecordHandler(RecordHandler recordHandler) {
+		this.recordHandler = recordHandler;
+
+	}
+
+	public String getStoredListAsJson() {
+		return storedListAsJson;
+	}
 
 }
